@@ -1,0 +1,318 @@
+{
+  "generatedAt": "2026-08-28T22:31:08.192Z",
+  "mode": "deterministic-replay",
+  "disclosure": "This replay validates orchestration and scoring. Live model results are written separately and must not be conflated with this artifact.",
+  "cases": 12,
+  "baseline": {
+    "rootCauseAccuracy": 0.3333,
+    "recoveryValidity": 0.3333,
+    "meanEvidenceCount": 1
+  },
+  "faultline": {
+    "rootCauseAccuracy": 0.9167,
+    "recoveryValidity": 0.9167,
+    "meanEvidenceCount": 3.3333
+  },
+  "results": [
+    {
+      "id": "INC-2481",
+      "title": "Checkout failures after configuration rollout",
+      "gold": {
+        "service": "checkout-service",
+        "fault": "config_type",
+        "action": "checkout-service:revert-config-key"
+      },
+      "baseline": {
+        "predictedService": "checkout-service",
+        "predictedAction": "checkout-service:revert-config-key",
+        "rootCauseCorrect": true,
+        "recoveryValid": true,
+        "evidenceCount": 1,
+        "confidence": null
+      },
+      "faultline": {
+        "predictedService": "checkout-service",
+        "predictedAction": "checkout-service:revert-config-key",
+        "rootCauseCorrect": true,
+        "recoveryValid": true,
+        "evidenceCount": 6,
+        "confidence": 98
+      }
+    },
+    {
+      "id": "INC-2482",
+      "title": "Recommendation latency under load",
+      "gold": {
+        "service": "recommendation-service",
+        "fault": "cpu_saturation",
+        "action": "recommendation-service:scale-out"
+      },
+      "baseline": {
+        "predictedService": "recommendation-service",
+        "predictedAction": "recommendation-service:scale-out",
+        "rootCauseCorrect": true,
+        "recoveryValid": true,
+        "evidenceCount": 1,
+        "confidence": null
+      },
+      "faultline": {
+        "predictedService": "recommendation-service",
+        "predictedAction": "recommendation-service:scale-out",
+        "rootCauseCorrect": true,
+        "recoveryValid": true,
+        "evidenceCount": 2,
+        "confidence": 98
+      }
+    },
+    {
+      "id": "INC-2483",
+      "title": "TLS failures at the edge",
+      "gold": {
+        "service": "gateway",
+        "fault": "expired_certificate",
+        "action": "gateway:activate-valid-certificate"
+      },
+      "baseline": {
+        "predictedService": "frontend",
+        "predictedAction": null,
+        "rootCauseCorrect": false,
+        "recoveryValid": false,
+        "evidenceCount": 1,
+        "confidence": null
+      },
+      "faultline": {
+        "predictedService": "gateway",
+        "predictedAction": "gateway:activate-valid-certificate",
+        "rootCauseCorrect": true,
+        "recoveryValid": true,
+        "evidenceCount": 3,
+        "confidence": 98
+      }
+    },
+    {
+      "id": "INC-2484",
+      "title": "Cart state disappears between requests",
+      "gold": {
+        "service": "cart",
+        "fault": "cache_eviction",
+        "action": "cart:restore-cache-policy"
+      },
+      "baseline": {
+        "predictedService": "checkout",
+        "predictedAction": null,
+        "rootCauseCorrect": false,
+        "recoveryValid": false,
+        "evidenceCount": 1,
+        "confidence": null
+      },
+      "faultline": {
+        "predictedService": "cart",
+        "predictedAction": "cart:restore-cache-policy",
+        "rootCauseCorrect": true,
+        "recoveryValid": true,
+        "evidenceCount": 4,
+        "confidence": 98
+      }
+    },
+    {
+      "id": "INC-2485",
+      "title": "Shipping quote timeouts",
+      "gold": {
+        "service": "dns",
+        "fault": "resolution_delay",
+        "action": "dns:revert-forwarding-rule"
+      },
+      "baseline": {
+        "predictedService": "shipping",
+        "predictedAction": null,
+        "rootCauseCorrect": false,
+        "recoveryValid": false,
+        "evidenceCount": 1,
+        "confidence": null
+      },
+      "faultline": {
+        "predictedService": "dns",
+        "predictedAction": "dns:revert-forwarding-rule",
+        "rootCauseCorrect": true,
+        "recoveryValid": true,
+        "evidenceCount": 3,
+        "confidence": 98
+      }
+    },
+    {
+      "id": "INC-2486",
+      "title": "Orders fail after catalog release",
+      "gold": {
+        "service": "catalog",
+        "fault": "schema_incompatibility",
+        "action": "catalog:enable-v1-compatibility"
+      },
+      "baseline": {
+        "predictedService": "orders",
+        "predictedAction": null,
+        "rootCauseCorrect": false,
+        "recoveryValid": false,
+        "evidenceCount": 1,
+        "confidence": null
+      },
+      "faultline": {
+        "predictedService": "catalog",
+        "predictedAction": "catalog:enable-v1-compatibility",
+        "rootCauseCorrect": true,
+        "recoveryValid": true,
+        "evidenceCount": 3,
+        "confidence": 96
+      }
+    },
+    {
+      "id": "INC-2487",
+      "title": "Email workers repeatedly restart",
+      "gold": {
+        "service": "email",
+        "fault": "memory_leak",
+        "action": "email:rollback-worker"
+      },
+      "baseline": {
+        "predictedService": "email",
+        "predictedAction": "email:rollback-worker",
+        "rootCauseCorrect": true,
+        "recoveryValid": true,
+        "evidenceCount": 1,
+        "confidence": null
+      },
+      "faultline": {
+        "predictedService": "email",
+        "predictedAction": "email:rollback-worker",
+        "rootCauseCorrect": true,
+        "recoveryValid": true,
+        "evidenceCount": 3,
+        "confidence": 98
+      }
+    },
+    {
+      "id": "INC-2488",
+      "title": "Accounting events stop processing",
+      "gold": {
+        "service": "kafka",
+        "fault": "partition_unavailable",
+        "action": "kafka:elect-partition-leader"
+      },
+      "baseline": {
+        "predictedService": "accounting",
+        "predictedAction": null,
+        "rootCauseCorrect": false,
+        "recoveryValid": false,
+        "evidenceCount": 1,
+        "confidence": null
+      },
+      "faultline": {
+        "predictedService": "kafka",
+        "predictedAction": "kafka:elect-partition-leader",
+        "rootCauseCorrect": true,
+        "recoveryValid": true,
+        "evidenceCount": 3,
+        "confidence": 98
+      }
+    },
+    {
+      "id": "INC-2489",
+      "title": "Currency provider rejects requests",
+      "gold": {
+        "service": "currency",
+        "fault": "retry_storm",
+        "action": "currency:restore-retry-policy"
+      },
+      "baseline": {
+        "predictedService": "currency",
+        "predictedAction": "currency:restore-retry-policy",
+        "rootCauseCorrect": true,
+        "recoveryValid": true,
+        "evidenceCount": 1,
+        "confidence": null
+      },
+      "faultline": {
+        "predictedService": "currency",
+        "predictedAction": "currency:restore-retry-policy",
+        "rootCauseCorrect": true,
+        "recoveryValid": true,
+        "evidenceCount": 3,
+        "confidence": 97
+      }
+    },
+    {
+      "id": "INC-2490",
+      "title": "Orders database connections exhausted",
+      "gold": {
+        "service": "orders-db",
+        "fault": "connection_exhaustion",
+        "action": "orders-db:restore-connection-limit"
+      },
+      "baseline": {
+        "predictedService": "frontend",
+        "predictedAction": null,
+        "rootCauseCorrect": false,
+        "recoveryValid": false,
+        "evidenceCount": 1,
+        "confidence": null
+      },
+      "faultline": {
+        "predictedService": "orders-db",
+        "predictedAction": "orders-db:restore-connection-limit",
+        "rootCauseCorrect": true,
+        "recoveryValid": true,
+        "evidenceCount": 4,
+        "confidence": 93
+      }
+    },
+    {
+      "id": "INC-2491",
+      "title": "Valid sessions rejected in one zone",
+      "gold": {
+        "service": "identity",
+        "fault": "clock_skew",
+        "action": "identity:resync-clock"
+      },
+      "baseline": {
+        "predictedService": "auth",
+        "predictedAction": null,
+        "rootCauseCorrect": false,
+        "recoveryValid": false,
+        "evidenceCount": 1,
+        "confidence": null
+      },
+      "faultline": {
+        "predictedService": "identity",
+        "predictedAction": "identity:resync-clock",
+        "rootCauseCorrect": true,
+        "recoveryValid": true,
+        "evidenceCount": 3,
+        "confidence": 98
+      }
+    },
+    {
+      "id": "INC-2492",
+      "title": "Intermittent failures in eu-south",
+      "gold": {
+        "service": "network",
+        "fault": "regional_packet_loss",
+        "action": "network:reroute-zone"
+      },
+      "baseline": {
+        "predictedService": "checkout",
+        "predictedAction": "checkout:rollback-canary",
+        "rootCauseCorrect": false,
+        "recoveryValid": false,
+        "evidenceCount": 1,
+        "confidence": null
+      },
+      "faultline": {
+        "predictedService": "checkout",
+        "predictedAction": "checkout:rollback-canary",
+        "rootCauseCorrect": false,
+        "recoveryValid": false,
+        "evidenceCount": 3,
+        "confidence": 87
+      }
+    }
+  ]
+}
