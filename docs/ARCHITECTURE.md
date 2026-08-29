@@ -19,14 +19,15 @@ Incident bundle
           │
           ▼
   Skeptical verifier
-  contradiction → causal chain → confidence
+  contradiction → next discriminating experiment
           │
           ▼
-  Action validator
-  allowed target/action only → human approval
+  Counterfactual laboratory
+  fresh snapshot → one changed variable → health diff
           │
           ▼
-  Sandbox replay + evidence package
+  Causal verifier + recovery proposal
+  symptom cleared → no regressions → human approval
 ```
 
 ## Design decisions
@@ -38,6 +39,10 @@ The project does not multiply agents for appearance. The investigator owns evide
 ### Deterministic tools around model judgment
 
 Telemetry retrieval and action validation are deterministic. A model can select tools and synthesize evidence, but it cannot invent a new recovery target or action. This keeps model judgment where it is useful while moving safety invariants into code.
+
+### Counterfactuals instead of confidence theater
+
+Evidence decides which hypothesis deserves the next test. It does not declare a winner. `run_counterfactual` applies one allowlisted action to a fresh synthetic snapshot and returns a before/after health diff. A claim is causal only when the original symptom clears and unrelated health checks remain stable. Failed experiments are retained as first-class evidence.
 
 ### Append-only trajectories
 
@@ -55,12 +60,12 @@ The interactive incident room replays a committed representative trajectory so j
 - `inspect_trace`: representative failing trace path
 - `inspect_changes`: changes near incident onset
 - `get_allowed_actions`: sandbox actions and approval requirements
+- `run_counterfactual`: isolated one-variable intervention with measured before/after health
 
 ## Consequential-action policy
 
 1. Only catalog actions are eligible.
-2. Live tools are read-only.
+2. Counterfactual tools operate only on synthetic snapshots and expose `productionConnected: false`.
 3. Recovery remains a proposal.
-4. A qualified human approves the sandbox replay.
+4. A qualified human approves any consequential recovery.
 5. Production execution is out of scope.
-

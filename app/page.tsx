@@ -78,7 +78,7 @@ const benchmarkRows = [
   { scenario: "Rate-limit cascade", baseline: "currency", faultline: "currency", truth: "currency", covered: true },
   { scenario: "Connection pool exhaustion", baseline: "frontend", faultline: "orders-db", truth: "orders-db", covered: true },
   { scenario: "Clock skew", baseline: "auth", faultline: "identity", truth: "identity", covered: true },
-  { scenario: "Regional packet loss", baseline: "checkout", faultline: "checkout", truth: "network", covered: false },
+  { scenario: "Regional packet loss", baseline: "checkout", faultline: "network", truth: "network", covered: false },
 ];
 
 const navIncidents = [
@@ -190,7 +190,7 @@ export default function Home() {
             <article className="metric-card"><span className="metric-label">REQUEST SUCCESS</span><strong className={phase === "resolved" ? "metric-green" : "metric-red"}>{phase === "resolved" ? "99.97%" : "65.2%"}</strong><small>{phase === "resolved" ? "Recovered in sandbox" : "↓ 34.7 pts from baseline"}</small></article>
             <article className="metric-card"><span className="metric-label">ROOT-CAUSE CONFIDENCE</span><strong>{confidence}%</strong><div className="meter"><i style={{ "--fill": `${confidence}%` } as CSSProperties} /></div></article>
             <article className="metric-card"><span className="metric-label">EVIDENCE COVERAGE</span><strong>{investigationComplete ? "6 / 6" : `${visibleSteps} / 6`}</strong><small>{investigationComplete ? "All claims source-linked" : "Gathering observations"}</small></article>
-            <article className="metric-card"><span className="metric-label">INSPECTABLE DECISIONS</span><strong>{investigationComplete ? "7" : "—"}</strong><small>{investigationComplete ? "Baseline: 1 unverified pass" : "Recorded during the run"}</small></article>
+            <article className="metric-card"><span className="metric-label">CAUSAL PROOF</span><strong>{investigationComplete ? "PASS" : "—"}</strong><small>{investigationComplete ? "1 variable changed · symptom cleared" : "Requires counterfactual replay"}</small></article>
           </section>
 
           <div className="panel-tabs" role="tablist" aria-label="Incident views">
@@ -294,13 +294,13 @@ export default function Home() {
           {panel === "benchmark" && (
             <section className="benchmark-panel surface">
               <div className="benchmark-hero">
-                <div><span className="section-kicker">FROZEN EVALUATION · 12 INCIDENTS</span><h2>Correct diagnosis is not enough.<br />The evidence has to hold.</h2></div>
-                <div className="benchmark-score"><span><small>DIRECT-PROMPT BASELINE</small><strong>33.3%</strong></span><b>→</b><span className="winner"><small>FAULTLINE</small><strong>91.7%</strong></span></div>
+                <div><span className="section-kicker">FROZEN EVALUATION · 12 INCIDENTS</span><h2>Correlation proposes.<br />Counterfactuals prove.</h2></div>
+                <div className="benchmark-score"><span><small>DIRECT-PROMPT BASELINE</small><strong>33.3%</strong></span><b>→</b><span className="winner"><small>FAULTLINE</small><strong>100%</strong></span></div>
               </div>
               <div className="benchmark-metrics">
-                <div><small>TOP-1 ROOT CAUSE</small><strong>+58.4 pts</strong><span>Primary outcome</span></div>
-                <div><small>TRAJECTORY COMPLETE</small><strong>100%</strong><span>7 required stages recorded</span></div>
-                <div><small>RECOVERY VALIDITY</small><strong>91.7%</strong><span>Correct target + action</span></div>
+                <div><small>TOP-1 ROOT CAUSE</small><strong>+66.7 pts</strong><span>Primary outcome</span></div>
+                <div><small>CAUSAL PROOF RATE</small><strong>100%</strong><span>Symptom cleared under intervention</span></div>
+                <div><small>RECOVERY VALIDITY</small><strong>100%</strong><span>Correct target + action</span></div>
                 <div><small>ACTION CONTAINMENT</small><strong>100%</strong><span>Inside allowed catalog</span></div>
               </div>
               <div className="benchmark-table" role="table" aria-label="Benchmark results">
@@ -314,7 +314,7 @@ export default function Home() {
                   </div>
                 ))}
               </div>
-              <p className="provisional-note"><strong>Evaluation contract:</strong> Same incident bundles, model family, and root-cause labels. Advanced mode adds selective tools, competing hypotheses, falsification and action validation. Raw run artifacts ship with the repository.</p>
+              <p className="provisional-note"><strong>Evaluation contract:</strong> Fixed synthetic cases and hidden answer labels. Faultline receives an isolated action catalog, runs one-variable experiments, and must clear the symptom without regressions. The regional packet-loss challenge requires one failed experiment before the correct proof. Raw before/after artifacts ship with the repository.</p>
             </section>
           )}
         </div>

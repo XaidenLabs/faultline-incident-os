@@ -1,17 +1,21 @@
 {
-  "generatedAt": "2026-08-28T22:31:08.192Z",
+  "generatedAt": "2026-08-29T07:17:41.632Z",
   "mode": "deterministic-replay",
   "disclosure": "This replay validates orchestration and scoring. Live model results are written separately and must not be conflated with this artifact.",
   "cases": 12,
   "baseline": {
     "rootCauseAccuracy": 0.3333,
     "recoveryValidity": 0.3333,
-    "meanEvidenceCount": 1
+    "causalProofRate": 0,
+    "meanEvidenceCount": 1,
+    "meanExperimentCount": 0
   },
   "faultline": {
-    "rootCauseAccuracy": 0.9167,
-    "recoveryValidity": 0.9167,
-    "meanEvidenceCount": 3.3333
+    "rootCauseAccuracy": 1,
+    "recoveryValidity": 1,
+    "causalProofRate": 1,
+    "meanEvidenceCount": 3.3333,
+    "meanExperimentCount": 1.0833
   },
   "results": [
     {
@@ -28,7 +32,9 @@
         "rootCauseCorrect": true,
         "recoveryValid": true,
         "evidenceCount": 1,
-        "confidence": null
+        "confidence": null,
+        "causalProof": false,
+        "experimentCount": 0
       },
       "faultline": {
         "predictedService": "checkout-service",
@@ -36,8 +42,44 @@
         "rootCauseCorrect": true,
         "recoveryValid": true,
         "evidenceCount": 6,
-        "confidence": 98
-      }
+        "confidence": 96,
+        "causalProof": true,
+        "experimentCount": 1
+      },
+      "experiments": [
+        {
+          "hypothesis": "checkout-service",
+          "experimentId": "INC-2481-CF-01",
+          "action": "checkout-service:revert-config-key",
+          "changedVariable": "revert-config-key",
+          "accepted": true,
+          "isolation": "fresh synthetic snapshot",
+          "productionConnected": false,
+          "before": {
+            "healthScore": 33,
+            "errorRatePct": 34.8,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [
+              "34.8% checkout failure rate in eu-west"
+            ],
+            "symptom": "34.8% checkout failure rate in eu-west"
+          },
+          "after": {
+            "healthScore": 96,
+            "errorRatePct": 0.8,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [],
+            "symptom": "cleared"
+          },
+          "effect": {
+            "healthDelta": 63,
+            "errorReductionPct": 97.7,
+            "symptomCleared": true,
+            "unrelatedRegressions": 0
+          },
+          "verdict": "causal"
+        }
+      ]
     },
     {
       "id": "INC-2482",
@@ -53,7 +95,9 @@
         "rootCauseCorrect": true,
         "recoveryValid": true,
         "evidenceCount": 1,
-        "confidence": null
+        "confidence": null,
+        "causalProof": false,
+        "experimentCount": 0
       },
       "faultline": {
         "predictedService": "recommendation-service",
@@ -61,8 +105,44 @@
         "rootCauseCorrect": true,
         "recoveryValid": true,
         "evidenceCount": 2,
-        "confidence": 98
-      }
+        "confidence": 96,
+        "causalProof": true,
+        "experimentCount": 1
+      },
+      "experiments": [
+        {
+          "hypothesis": "recommendation-service",
+          "experimentId": "INC-2482-CF-01",
+          "action": "recommendation-service:scale-out",
+          "changedVariable": "scale-out",
+          "accepted": true,
+          "isolation": "fresh synthetic snapshot",
+          "productionConnected": false,
+          "before": {
+            "healthScore": 18,
+            "errorRatePct": 61,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [
+              "p99 recommendation latency 8.4s"
+            ],
+            "symptom": "p99 recommendation latency 8.4s"
+          },
+          "after": {
+            "healthScore": 96,
+            "errorRatePct": 0.8,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [],
+            "symptom": "cleared"
+          },
+          "effect": {
+            "healthDelta": 78,
+            "errorReductionPct": 98.7,
+            "symptomCleared": true,
+            "unrelatedRegressions": 0
+          },
+          "verdict": "causal"
+        }
+      ]
     },
     {
       "id": "INC-2483",
@@ -78,7 +158,9 @@
         "rootCauseCorrect": false,
         "recoveryValid": false,
         "evidenceCount": 1,
-        "confidence": null
+        "confidence": null,
+        "causalProof": false,
+        "experimentCount": 0
       },
       "faultline": {
         "predictedService": "gateway",
@@ -86,8 +168,44 @@
         "rootCauseCorrect": true,
         "recoveryValid": true,
         "evidenceCount": 3,
-        "confidence": 98
-      }
+        "confidence": 96,
+        "causalProof": true,
+        "experimentCount": 1
+      },
+      "experiments": [
+        {
+          "hypothesis": "gateway",
+          "experimentId": "INC-2483-CF-01",
+          "action": "gateway:activate-valid-certificate",
+          "changedVariable": "activate-valid-certificate",
+          "accepted": true,
+          "isolation": "fresh synthetic snapshot",
+          "productionConnected": false,
+          "before": {
+            "healthScore": 26,
+            "errorRatePct": 42,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [
+              "handshake failures for 42% of new sessions"
+            ],
+            "symptom": "handshake failures for 42% of new sessions"
+          },
+          "after": {
+            "healthScore": 96,
+            "errorRatePct": 0.8,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [],
+            "symptom": "cleared"
+          },
+          "effect": {
+            "healthDelta": 70,
+            "errorReductionPct": 98.1,
+            "symptomCleared": true,
+            "unrelatedRegressions": 0
+          },
+          "verdict": "causal"
+        }
+      ]
     },
     {
       "id": "INC-2484",
@@ -103,7 +221,9 @@
         "rootCauseCorrect": false,
         "recoveryValid": false,
         "evidenceCount": 1,
-        "confidence": null
+        "confidence": null,
+        "causalProof": false,
+        "experimentCount": 0
       },
       "faultline": {
         "predictedService": "cart",
@@ -111,8 +231,44 @@
         "rootCauseCorrect": true,
         "recoveryValid": true,
         "evidenceCount": 4,
-        "confidence": 98
-      }
+        "confidence": 96,
+        "causalProof": true,
+        "experimentCount": 1
+      },
+      "experiments": [
+        {
+          "hypothesis": "cart",
+          "experimentId": "INC-2484-CF-01",
+          "action": "cart:restore-cache-policy",
+          "changedVariable": "restore-cache-policy",
+          "accepted": true,
+          "isolation": "fresh synthetic snapshot",
+          "productionConnected": false,
+          "before": {
+            "healthScore": 30,
+            "errorRatePct": 38,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [
+              "checkout reports empty carts"
+            ],
+            "symptom": "checkout reports empty carts"
+          },
+          "after": {
+            "healthScore": 96,
+            "errorRatePct": 0.8,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [],
+            "symptom": "cleared"
+          },
+          "effect": {
+            "healthDelta": 66,
+            "errorReductionPct": 97.9,
+            "symptomCleared": true,
+            "unrelatedRegressions": 0
+          },
+          "verdict": "causal"
+        }
+      ]
     },
     {
       "id": "INC-2485",
@@ -128,7 +284,9 @@
         "rootCauseCorrect": false,
         "recoveryValid": false,
         "evidenceCount": 1,
-        "confidence": null
+        "confidence": null,
+        "causalProof": false,
+        "experimentCount": 0
       },
       "faultline": {
         "predictedService": "dns",
@@ -136,8 +294,44 @@
         "rootCauseCorrect": true,
         "recoveryValid": true,
         "evidenceCount": 3,
-        "confidence": 98
-      }
+        "confidence": 96,
+        "causalProof": true,
+        "experimentCount": 1
+      },
+      "experiments": [
+        {
+          "hypothesis": "dns",
+          "experimentId": "INC-2485-CF-01",
+          "action": "dns:revert-forwarding-rule",
+          "changedVariable": "revert-forwarding-rule",
+          "accepted": true,
+          "isolation": "fresh synthetic snapshot",
+          "productionConnected": false,
+          "before": {
+            "healthScore": 23,
+            "errorRatePct": 45,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [
+              "shipping quote p95 exceeds 12s"
+            ],
+            "symptom": "shipping quote p95 exceeds 12s"
+          },
+          "after": {
+            "healthScore": 96,
+            "errorRatePct": 0.8,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [],
+            "symptom": "cleared"
+          },
+          "effect": {
+            "healthDelta": 73,
+            "errorReductionPct": 98.2,
+            "symptomCleared": true,
+            "unrelatedRegressions": 0
+          },
+          "verdict": "causal"
+        }
+      ]
     },
     {
       "id": "INC-2486",
@@ -153,7 +347,9 @@
         "rootCauseCorrect": false,
         "recoveryValid": false,
         "evidenceCount": 1,
-        "confidence": null
+        "confidence": null,
+        "causalProof": false,
+        "experimentCount": 0
       },
       "faultline": {
         "predictedService": "catalog",
@@ -161,8 +357,44 @@
         "rootCauseCorrect": true,
         "recoveryValid": true,
         "evidenceCount": 3,
-        "confidence": 96
-      }
+        "confidence": 96,
+        "causalProof": true,
+        "experimentCount": 1
+      },
+      "experiments": [
+        {
+          "hypothesis": "catalog",
+          "experimentId": "INC-2486-CF-01",
+          "action": "catalog:enable-v1-compatibility",
+          "changedVariable": "enable-v1-compatibility",
+          "accepted": true,
+          "isolation": "fresh synthetic snapshot",
+          "productionConnected": false,
+          "before": {
+            "healthScore": 18,
+            "errorRatePct": 53,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [
+              "order validation rejects existing products"
+            ],
+            "symptom": "order validation rejects existing products"
+          },
+          "after": {
+            "healthScore": 96,
+            "errorRatePct": 0.8,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [],
+            "symptom": "cleared"
+          },
+          "effect": {
+            "healthDelta": 78,
+            "errorReductionPct": 98.5,
+            "symptomCleared": true,
+            "unrelatedRegressions": 0
+          },
+          "verdict": "causal"
+        }
+      ]
     },
     {
       "id": "INC-2487",
@@ -178,7 +410,9 @@
         "rootCauseCorrect": true,
         "recoveryValid": true,
         "evidenceCount": 1,
-        "confidence": null
+        "confidence": null,
+        "causalProof": false,
+        "experimentCount": 0
       },
       "faultline": {
         "predictedService": "email",
@@ -186,8 +420,44 @@
         "rootCauseCorrect": true,
         "recoveryValid": true,
         "evidenceCount": 3,
-        "confidence": 98
-      }
+        "confidence": 96,
+        "causalProof": true,
+        "experimentCount": 1
+      },
+      "experiments": [
+        {
+          "hypothesis": "email",
+          "experimentId": "INC-2487-CF-01",
+          "action": "email:rollback-worker",
+          "changedVariable": "rollback-worker",
+          "accepted": true,
+          "isolation": "fresh synthetic snapshot",
+          "productionConnected": false,
+          "before": {
+            "healthScore": 18,
+            "errorRatePct": 72,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [
+              "confirmation queue lag 19 minutes"
+            ],
+            "symptom": "confirmation queue lag 19 minutes"
+          },
+          "after": {
+            "healthScore": 96,
+            "errorRatePct": 0.8,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [],
+            "symptom": "cleared"
+          },
+          "effect": {
+            "healthDelta": 78,
+            "errorReductionPct": 98.9,
+            "symptomCleared": true,
+            "unrelatedRegressions": 0
+          },
+          "verdict": "causal"
+        }
+      ]
     },
     {
       "id": "INC-2488",
@@ -203,7 +473,9 @@
         "rootCauseCorrect": false,
         "recoveryValid": false,
         "evidenceCount": 1,
-        "confidence": null
+        "confidence": null,
+        "causalProof": false,
+        "experimentCount": 0
       },
       "faultline": {
         "predictedService": "kafka",
@@ -211,8 +483,44 @@
         "rootCauseCorrect": true,
         "recoveryValid": true,
         "evidenceCount": 3,
-        "confidence": 98
-      }
+        "confidence": 96,
+        "causalProof": true,
+        "experimentCount": 1
+      },
+      "experiments": [
+        {
+          "hypothesis": "kafka",
+          "experimentId": "INC-2488-CF-01",
+          "action": "kafka:elect-partition-leader",
+          "changedVariable": "elect-partition-leader",
+          "accepted": true,
+          "isolation": "fresh synthetic snapshot",
+          "productionConnected": false,
+          "before": {
+            "healthScore": 20,
+            "errorRatePct": 48,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [
+              "consumer lag increases across all accounting pods"
+            ],
+            "symptom": "consumer lag increases across all accounting pods"
+          },
+          "after": {
+            "healthScore": 96,
+            "errorRatePct": 0.8,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [],
+            "symptom": "cleared"
+          },
+          "effect": {
+            "healthDelta": 76,
+            "errorReductionPct": 98.3,
+            "symptomCleared": true,
+            "unrelatedRegressions": 0
+          },
+          "verdict": "causal"
+        }
+      ]
     },
     {
       "id": "INC-2489",
@@ -228,7 +536,9 @@
         "rootCauseCorrect": true,
         "recoveryValid": true,
         "evidenceCount": 1,
-        "confidence": null
+        "confidence": null,
+        "causalProof": false,
+        "experimentCount": 0
       },
       "faultline": {
         "predictedService": "currency",
@@ -236,8 +546,44 @@
         "rootCauseCorrect": true,
         "recoveryValid": true,
         "evidenceCount": 3,
-        "confidence": 97
-      }
+        "confidence": 96,
+        "causalProof": true,
+        "experimentCount": 1
+      },
+      "experiments": [
+        {
+          "hypothesis": "currency",
+          "experimentId": "INC-2489-CF-01",
+          "action": "currency:restore-retry-policy",
+          "changedVariable": "restore-retry-policy",
+          "accepted": true,
+          "isolation": "fresh synthetic snapshot",
+          "productionConnected": false,
+          "before": {
+            "healthScore": 24,
+            "errorRatePct": 44,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [
+              "price conversion fails intermittently"
+            ],
+            "symptom": "price conversion fails intermittently"
+          },
+          "after": {
+            "healthScore": 96,
+            "errorRatePct": 0.8,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [],
+            "symptom": "cleared"
+          },
+          "effect": {
+            "healthDelta": 72,
+            "errorReductionPct": 98.2,
+            "symptomCleared": true,
+            "unrelatedRegressions": 0
+          },
+          "verdict": "causal"
+        }
+      ]
     },
     {
       "id": "INC-2490",
@@ -253,7 +599,9 @@
         "rootCauseCorrect": false,
         "recoveryValid": false,
         "evidenceCount": 1,
-        "confidence": null
+        "confidence": null,
+        "causalProof": false,
+        "experimentCount": 0
       },
       "faultline": {
         "predictedService": "orders-db",
@@ -261,8 +609,44 @@
         "rootCauseCorrect": true,
         "recoveryValid": true,
         "evidenceCount": 4,
-        "confidence": 93
-      }
+        "confidence": 96,
+        "causalProof": true,
+        "experimentCount": 1
+      },
+      "experiments": [
+        {
+          "hypothesis": "orders-db",
+          "experimentId": "INC-2490-CF-01",
+          "action": "orders-db:restore-connection-limit",
+          "changedVariable": "restore-connection-limit",
+          "accepted": true,
+          "isolation": "fresh synthetic snapshot",
+          "productionConnected": false,
+          "before": {
+            "healthScore": 18,
+            "errorRatePct": 58,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [
+              "order writes time out while reads remain healthy"
+            ],
+            "symptom": "order writes time out while reads remain healthy"
+          },
+          "after": {
+            "healthScore": 96,
+            "errorRatePct": 0.8,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [],
+            "symptom": "cleared"
+          },
+          "effect": {
+            "healthDelta": 78,
+            "errorReductionPct": 98.6,
+            "symptomCleared": true,
+            "unrelatedRegressions": 0
+          },
+          "verdict": "causal"
+        }
+      ]
     },
     {
       "id": "INC-2491",
@@ -278,7 +662,9 @@
         "rootCauseCorrect": false,
         "recoveryValid": false,
         "evidenceCount": 1,
-        "confidence": null
+        "confidence": null,
+        "causalProof": false,
+        "experimentCount": 0
       },
       "faultline": {
         "predictedService": "identity",
@@ -286,8 +672,44 @@
         "rootCauseCorrect": true,
         "recoveryValid": true,
         "evidenceCount": 3,
-        "confidence": 98
-      }
+        "confidence": 96,
+        "causalProof": true,
+        "experimentCount": 1
+      },
+      "experiments": [
+        {
+          "hypothesis": "identity",
+          "experimentId": "INC-2491-CF-01",
+          "action": "identity:resync-clock",
+          "changedVariable": "resync-clock",
+          "accepted": true,
+          "isolation": "fresh synthetic snapshot",
+          "productionConnected": false,
+          "before": {
+            "healthScore": 31,
+            "errorRatePct": 37,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [
+              "auth tokens report not-yet-valid"
+            ],
+            "symptom": "auth tokens report not-yet-valid"
+          },
+          "after": {
+            "healthScore": 96,
+            "errorRatePct": 0.8,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [],
+            "symptom": "cleared"
+          },
+          "effect": {
+            "healthDelta": 65,
+            "errorReductionPct": 97.8,
+            "symptomCleared": true,
+            "unrelatedRegressions": 0
+          },
+          "verdict": "causal"
+        }
+      ]
     },
     {
       "id": "INC-2492",
@@ -303,16 +725,88 @@
         "rootCauseCorrect": false,
         "recoveryValid": false,
         "evidenceCount": 1,
-        "confidence": null
+        "confidence": null,
+        "causalProof": false,
+        "experimentCount": 0
       },
       "faultline": {
-        "predictedService": "checkout",
-        "predictedAction": "checkout:rollback-canary",
-        "rootCauseCorrect": false,
-        "recoveryValid": false,
+        "predictedService": "network",
+        "predictedAction": "network:reroute-zone",
+        "rootCauseCorrect": true,
+        "recoveryValid": true,
         "evidenceCount": 3,
-        "confidence": 87
-      }
+        "confidence": 96,
+        "causalProof": true,
+        "experimentCount": 2
+      },
+      "experiments": [
+        {
+          "hypothesis": "checkout",
+          "experimentId": "INC-2492-CF-02",
+          "action": "checkout:rollback-canary",
+          "changedVariable": "rollback-canary",
+          "accepted": true,
+          "isolation": "fresh synthetic snapshot",
+          "productionConnected": false,
+          "before": {
+            "healthScore": 49,
+            "errorRatePct": 19,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [
+              "multi-service packet loss around 7%"
+            ],
+            "symptom": "multi-service packet loss around 7%"
+          },
+          "after": {
+            "healthScore": 49,
+            "errorRatePct": 19,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [
+              "multi-service packet loss around 7%"
+            ],
+            "symptom": "multi-service packet loss around 7%"
+          },
+          "effect": {
+            "healthDelta": 0,
+            "errorReductionPct": 0,
+            "symptomCleared": false,
+            "unrelatedRegressions": 0
+          },
+          "verdict": "rejected"
+        },
+        {
+          "hypothesis": "network",
+          "experimentId": "INC-2492-CF-01",
+          "action": "network:reroute-zone",
+          "changedVariable": "reroute-zone",
+          "accepted": true,
+          "isolation": "fresh synthetic snapshot",
+          "productionConnected": false,
+          "before": {
+            "healthScore": 49,
+            "errorRatePct": 19,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [
+              "multi-service packet loss around 7%"
+            ],
+            "symptom": "multi-service packet loss around 7%"
+          },
+          "after": {
+            "healthScore": 96,
+            "errorRatePct": 0.8,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [],
+            "symptom": "cleared"
+          },
+          "effect": {
+            "healthDelta": 47,
+            "errorReductionPct": 95.8,
+            "symptomCleared": true,
+            "unrelatedRegressions": 0
+          },
+          "verdict": "causal"
+        }
+      ]
     }
   ]
 }

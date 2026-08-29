@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { investigatorInstructions } from "./prompts.mjs";
 import { publicScenario, scenarios } from "./scenarios.mjs";
+import { createIncidentSandbox } from "./sandbox.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -13,6 +14,7 @@ export async function runLiveAgent(scenario, options = {}) {
   const model = options.model ?? process.env.OPENAI_MODEL ?? "gpt-5.6-luna";
   const baseUrl = (process.env.OPENAI_BASE_URL ?? "https://api.openai.com/v1").replace(/\/$/, "");
   const visible = publicScenario(scenario);
+  const sandbox = createIncidentSandbox(scenario);
   const trace = [];
   let previousResponseId;
   let input = `Investigate ${scenario.id}: ${scenario.title}. Alert: ${scenario.symptom}. Begin by inspecting the available telemetry.`;
@@ -47,7 +49,7 @@ export async function runLiveAgent(scenario, options = {}) {
 
     input = calls.map((call) => {
       const args = safeJson(call.arguments);
-      const output = executeTool(call.name, args, visible);
+      const output = executeTool(call.name, args, visible, sandbox);
       trace.push({ at: new Date().toISOString(), type: "tool_result", turn, callId: call.call_id, name: call.name, arguments: args, output });
       return { type: "function_call_output", call_id: call.call_id, output: JSON.stringify(output) };
     });
@@ -72,15 +74,17 @@ const toolDefinitions = [
   tool("inspect_trace", "Inspect the representative failing distributed trace.", {}),
   tool("inspect_changes", "List changes near the incident start time.", {}),
   tool("get_allowed_actions", "List the recovery actions permitted in this incident sandbox.", {}),
+  tool("run_counterfactual", "Apply one allowed intervention to a fresh isolated snapshot and measure whether the incident symptom disappears. This never contacts production.", { action: stringProperty("Exact action returned by get_allowed_actions") }, ["action"]),
 ];
 
-function executeTool(name, args, scenario) {
+export function executeTool(name, args, scenario, sandbox) {
   if (name === "inventory_telemetry") return { topology: scenario.topology, services: scenario.candidates.map((item) => item.service), sources: ["metrics", "logs", "traces", "changes", "action catalog"] };
   if (name === "query_metrics") return scenario.candidates.filter((item) => !args.service || item.service === args.service);
   if (name === "query_logs") return scenario.logs.filter((line) => line.toLowerCase().includes(String(args.query).toLowerCase()) || scenario.candidates.some((item) => String(args.query).includes(item.service)));
   if (name === "inspect_trace") return scenario.trace;
   if (name === "inspect_changes") return scenario.changes;
   if (name === "get_allowed_actions") return scenario.allowedActions.map((action, index) => ({ id: `A-${index + 1}`, action, requiresApproval: true, mode: "sandbox" }));
+  if (name === "run_counterfactual") return sandbox.runCounterfactual(args.action);
   return { error: `Unknown tool ${name}` };
 }
 

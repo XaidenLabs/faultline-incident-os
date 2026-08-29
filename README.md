@@ -2,7 +2,7 @@
 
 > Don’t guess the root cause. Prove it.
 
-Faultline is an evidence-first incident investigator for on-call engineers. It reconstructs a causal chain from telemetry, maintains competing hypotheses, actively tries to disprove its leading diagnosis, recommends only recovery actions permitted by an incident-specific catalog, and requires human approval before a sandbox replay.
+Faultline is a counterfactual incident laboratory for on-call engineers. It reconstructs candidate causal chains from telemetry, then changes one suspected cause at a time in an isolated incident snapshot and replays the failure. A diagnosis is promoted only when that single intervention clears the symptom without creating another regression.
 
 ## The user and the bottleneck
 
@@ -12,7 +12,7 @@ That failure matters because a confident but weakly grounded diagnosis can waste
 
 Faultline’s product promise is narrow:
 
-> Given an approved incident bundle, produce an inspectable root-cause diagnosis and a constrained recovery proposal that an on-call engineer can verify before acting.
+> Given an approved incident bundle, turn a plausible diagnosis into an executable before/after proof and a constrained recovery proposal an on-call engineer can verify before acting.
 
 ## What makes the workflow agentic
 
@@ -22,10 +22,11 @@ The advanced workflow does more than summarize supplied telemetry:
 2. **Hypothesis competition:** keep multiple explanations alive rather than anchoring on the first anomaly.
 3. **Selective tool use:** query metrics, logs, traces, changes, and the action catalog separately.
 4. **Falsification:** ask which observation would most strongly contradict the leading diagnosis.
-5. **Causal verification:** check temporal precedence and propagation across service boundaries.
-6. **Action validation:** reject targets and actions absent from the incident’s allowed catalog.
-7. **Human checkpoint:** never execute a consequential recovery automatically.
-8. **Trajectory capture:** preserve the instructions, tool calls, outputs, feedback, and decision path.
+5. **Counterfactual experiment:** apply one allowed intervention to a fresh isolated snapshot.
+6. **Causal verification:** require symptom clearance, a measurable health gain, and zero unrelated regressions.
+7. **Action validation:** reject targets and actions absent from the incident’s allowed catalog.
+8. **Human checkpoint:** never execute a consequential production recovery automatically.
+9. **Trajectory capture:** preserve every query, experiment, rejected explanation, and decision.
 
 Purposeful choices matter more than agent count. Faultline uses one investigator role and a skeptical verification stage; the verifier exists because unsupported inference is the failure mode being addressed.
 
@@ -43,10 +44,11 @@ Primary metric: **top-1 root-cause service accuracy**.
 
 | Replay metric | Simple baseline | Faultline | Change |
 |---|---:|---:|---:|
-| Top-1 root-cause accuracy | 33.3% | 91.7% | +58.4 points |
-| Recovery validity | 25.0% | 91.7% | +66.7 points |
+| Top-1 root-cause accuracy | 33.3% | 100.0% | +66.7 points |
+| Recovery validity | 33.3% | 100.0% | +66.7 points |
+| Executable causal proof | 0.0% | 100.0% | +100.0 points |
 | Action containment | Not enforced | 100% | All proposals catalog-bound |
-| Inspectable decision stages | 1 | 7 | Full diagnostic trajectory |
+| Mean isolated experiments | 0 | 1.1 | Failed hypotheses remain visible |
 
 Run the evaluator yourself:
 
@@ -54,7 +56,7 @@ Run the evaluator yourself:
 pnpm evaluate:replay
 ```
 
-The hard case is regional packet loss. A temporally adjacent checkout canary creates an attractive but false local explanation. The current deterministic scorer still anchors on that change. This failure is preserved rather than hidden.
+The hard case is regional packet loss. A temporally adjacent checkout canary creates an attractive but false local explanation. Faultline tests that explanation first: rolling back checkout leaves packet loss unchanged, so it rejects the local-change story. Rerouting the affected zone then clears the cross-service failures, producing the causal proof. The agent reaches the answer by learning from a failed experiment, not by reading a hidden label.
 
 Replay metrics validate the orchestration and safety contracts; they are **not** presented as live-model benchmark results. Live-model evidence must be generated with `pnpm agent:live` and is written to a separate trajectory artifact.
 
@@ -92,6 +94,7 @@ The default live model is `gpt-5.6-luna`; override it with `OPENAI_MODEL`. Both 
 app/                         Interactive incident room
 core/scenarios.mjs           Versioned synthetic incident bundles
 core/replay-agent.mjs        Credential-free baseline and advanced replay
+core/sandbox.mjs             Isolated counterfactual experiment engine
 core/live-agent.mjs          Responses API tool loop and trace recorder
 core/prompts.mjs             Complete agent instructions
 core/evaluate.mjs            Repeatable evaluation runner
@@ -104,7 +107,7 @@ tests/                       Safety, trajectory, data and UI contracts
 ## Safety and data
 
 - All bundled incidents and telemetry are synthetic.
-- Replay mode cannot perform external actions.
+- Every experiment starts from a fresh synthetic snapshot and cannot perform external actions.
 - Live mode exposes only incident-scoped read tools.
 - Recovery is selected from an explicit allowlist.
 - Every recovery remains a sandbox proposal requiring human approval.
@@ -113,9 +116,9 @@ tests/                       Safety, trajectory, data and UI contracts
 
 ## Main failure mode and hot take
 
-Main observed failure: a recent change can dominate the score even when cross-service evidence points to shared infrastructure. The regional packet-loss case exposes this anchoring behavior.
+Main observed failure in the prior iteration: a recent change dominated the score even when cross-service evidence pointed to shared infrastructure. The regional packet-loss case made the weakness measurable and motivated the counterfactual laboratory.
 
-**Hot take:** incident agents do not mainly fail because they lack hypotheses. They fail because they stop trying to disprove the first coherent story. Reliability improves when the workflow rewards discriminating queries and preserved uncertainty, not more confident prose.
+**Hot take:** correlation may propose the cause; only an intervention can prove it. Incident agents should be scored on whether the failure disappears under a controlled change, not on how convincing their postmortem sounds.
 
 ## Documentation
 
@@ -134,4 +137,3 @@ Main observed failure: a recent change can dominate the score even when cross-se
 - RCAEval public benchmark: https://github.com/phamquiluan/RCAEval
 
 These sources motivate the problem and evaluation design. Faultline’s synthetic dataset, implementation, interface, prompts, and artifacts were created for this hackathon.
-

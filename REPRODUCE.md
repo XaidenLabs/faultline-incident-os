@@ -39,7 +39,8 @@ Expected result: all tests pass. The suite checks that:
 - at least ten evaluation cases are present;
 - the challenging regional packet-loss case is included;
 - recovery proposals never leave the allowlist;
-- the advanced workflow retains all seven trajectory stages;
+- every counterfactual remains isolated from production;
+- the hard case rejects the plausible checkout intervention before proving the network cause;
 - the advanced replay improves over the simple baseline;
 - the product surface contains the required workflow and no starter content.
 
@@ -56,14 +57,16 @@ Expected console result:
 ```text
 Faultline deterministic replay (12 cases)
 Baseline root-cause accuracy:  33.3%
-Faultline root-cause accuracy: 91.7%
-Faultline recovery validity:   91.7%
+Faultline root-cause accuracy: 100.0%
+Faultline recovery validity:   100.0%
+Faultline causal proof rate:   100.0%
 ```
 
 Expected artifacts:
 
 - `artifacts/evaluation/replay-summary.json`
 - `artifacts/trajectories/featured-replay.jsonl`
+- `artifacts/trajectories/challenge-counterfactual.jsonl`
 
 Approximate runtime: under one second. API cost: $0.
 
@@ -125,4 +128,3 @@ Expected result: a Cloudflare Worker-compatible ESM build in `dist/`.
 - A live call returns an unavailable-model error: set `OPENAI_MODEL` to a tool-capable Responses API model available to the account, and use the same model for baseline and advanced runs.
 - The local Cloudflare runtime rejects an older macOS version: use `next dev --webpack` for local inspection or build in Linux/macOS 13.5+. This does not change the production target.
 - Results differ after editing scenarios or scoring: restore the committed cases and rerun with a clean worktree. Evaluation inputs are versioned deliberately.
-

@@ -1,4 +1,5 @@
 import { publicScenario } from "./scenarios.mjs";
+import { createIncidentSandbox } from "./sandbox.mjs";
 
 export function runBaseline(scenario) {
   // Credible simple baseline: one pass over a telemetry summary and choose the
@@ -17,6 +18,7 @@ export function runBaseline(scenario) {
 export function runFaultline(scenario) {
   const visible = publicScenario(scenario);
   const trajectory = [];
+  const sandbox = createIncidentSandbox(scenario);
 
   trajectory.push(event("investigator", "inventory_fault_surface", {
     symptom: visible.symptom,
@@ -39,32 +41,55 @@ export function runFaultline(scenario) {
   const leading = hypotheses[0];
   const alternative = hypotheses[1];
   const margin = leading.score - alternative.score;
-  const survived = leading.contradicting === 0 && margin >= 12;
 
   trajectory.push(event("verifier", "falsify_leading_hypothesis", {
     target: leading.service,
     strongestAlternative: alternative.service,
     margin,
-    survived,
+    survived: leading.contradicting === 0 && margin >= 12,
     checks: ["temporal precedence", "cross-service propagation", "contradicting observations"],
   }));
 
-  // A deliberately conservative behavior: ambiguous cases are not allowed to
-  // jump from correlation to a high-confidence causal claim.
-  const service = survived ? leading.service : hypotheses.find((item) => item.contradicting === 0)?.service ?? leading.service;
-  const action = visible.allowedActions.find((item) => item.startsWith(`${service}:`)) ?? null;
-  const actionValid = Boolean(action);
+  trajectory.push(event("sandbox", "snapshot_incident_state", sandbox.describe()));
+
+  // Evidence ranks what to test; it does not decide what is true. Every allowed
+  // intervention runs against a fresh snapshot, and only symptom clearance can
+  // promote a hypothesis to a causal claim.
+  const experiments = [];
+  for (const hypothesis of hypotheses) {
+    const action = visible.allowedActions.find((item) => item.startsWith(`${hypothesis.service}:`));
+    if (!action || experiments.some((item) => item.action === action)) continue;
+    const result = sandbox.runCounterfactual(action);
+    experiments.push({ hypothesis: hypothesis.service, ...result });
+    trajectory.push(event("sandbox", "run_counterfactual", experiments.at(-1)));
+    if (result.effect?.symptomCleared && result.effect.unrelatedRegressions === 0) break;
+  }
+
+  const proof = experiments.find((item) => item.verdict === "causal" && item.effect?.symptomCleared);
+  const service = proof?.hypothesis ?? leading.service;
+  const action = proof?.action ?? null;
+  const actionValid = Boolean(action && visible.allowedActions.includes(action));
+
+  trajectory.push(event("verifier", "verify_causal_proof", {
+    service,
+    action,
+    proven: Boolean(proof),
+    rejectedHypotheses: experiments.filter((item) => item.verdict === "rejected").map((item) => item.hypothesis),
+    acceptanceRule: "symptom clears, health improves, and no unrelated regression appears",
+  }));
 
   trajectory.push(event("verifier", "validate_recovery_action", {
-    service, action, allowed: actionValid, humanApprovalRequired: true,
+    service, action, allowed: actionValid, humanApprovalRequired: true, executedInProduction: false,
   }));
 
   return {
     service,
     action,
-    confidence: confidenceFromMargin(margin, survived),
+    confidence: proof ? Math.min(98, 86 + Math.round(proof.effect.errorReductionPct / 10)) : confidenceFromMargin(margin, false),
     evidence: [...visible.changes, ...visible.logs, ...visible.trace],
     actionValid,
+    causalProof: Boolean(proof),
+    experiments,
     trajectory,
   };
 }
@@ -84,4 +109,3 @@ function confidenceFromMargin(margin, survived) {
 function event(actor, action, output) {
   return { at: new Date().toISOString(), actor, action, output };
 }
-
