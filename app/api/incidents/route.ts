@@ -1,4 +1,3 @@
-// @ts-expect-error The replay dataset is intentionally versioned as ESM JavaScript.
 import { publicScenario, scenarios } from "../../../core/scenarios.mjs";
 import { hasPersistentStore, listIncidents, syncIncidents, type StoredIncident } from "../../lib/faultline-store";
 

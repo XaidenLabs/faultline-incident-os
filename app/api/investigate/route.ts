@@ -1,8 +1,5 @@
-// @ts-expect-error The incident engine is intentionally versioned as ESM JavaScript.
 import { runIncidentOS } from "../../../core/incident-os.mjs";
-// @ts-expect-error The replay workflow is intentionally versioned as ESM JavaScript.
 import { runBaseline } from "../../../core/replay-agent.mjs";
-// @ts-expect-error The replay dataset is intentionally versioned as ESM JavaScript.
 import { scenarios } from "../../../core/scenarios.mjs";
 import { claimRun, completeRun, enqueueRun, failRun, hasPersistentStore, latestRun } from "../../lib/faultline-store";
 

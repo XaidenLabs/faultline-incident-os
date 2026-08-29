@@ -1,11 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import dynamic from "next/dynamic";
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
-
-const FaultlineScene = dynamic(() => import("./components/FaultlineScene"), { ssr: false });
 
 const lifecycle = [
   { step: "01", title: "Observe the whole fault surface", copy: "Normalize metrics, logs, traces, changes, topology and allowed actions into one incident bundle." },
@@ -24,16 +21,17 @@ export default function LandingPage() {
     const context = gsap.context(() => {
       gsap.from(".hero-reveal", { y: 34, opacity: 0, duration: 1, stagger: 0.1, ease: "power3.out" });
       gsap.from(".hero-stage", { scale: 0.96, opacity: 0, duration: 1.25, delay: 0.12, ease: "power3.out" });
-      observer = new IntersectionObserver((entries) => {
+      const revealObserver = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
           if (!entry.isIntersecting) return;
           gsap.to(entry.target, { y: 0, opacity: 1, duration: 0.85, ease: "power3.out" });
-          observer.unobserve(entry.target);
+          revealObserver.unobserve(entry.target);
         });
       }, { threshold: 0.16 });
+      observer = revealObserver;
       root.querySelectorAll(".scroll-reveal").forEach((element) => {
         gsap.set(element, { y: 45, opacity: 0 });
-        observer.observe(element);
+        revealObserver.observe(element);
       });
     }, root);
     return () => {
@@ -51,15 +49,16 @@ export default function LandingPage() {
       </nav>
 
       <section className="hero-stage">
-        <FaultlineScene />
         <div className="hero-copy">
-          <span className="hero-reveal micro-label">COUNTERFACTUAL INCIDENT INTELLIGENCE</span>
+          <span className="hero-reveal micro-label">FRONTIER AGENTIC INCIDENT ENGINEERING</span>
           <h1 className="hero-reveal">Incidents don’t need another explanation.<br /><em>They need proof.</em></h1>
-          <p className="hero-reveal">Faultline changes one suspected cause, replays the failure, and shows whether the incident disappears—before recovery ever touches production.</p>
+          <p className="hero-reveal">Faultline changes one suspected cause inside a synthetic snapshot, replays the failure, and preserves the evidence trail—before a human-approved recovery ever touches production.</p>
           <div className="hero-reveal hero-actions"><Link className="pill-button pill-light" href="/dashboard">Run the hard case <span>→</span></Link><a className="text-link" href="#system">See the full system ↓</a></div>
         </div>
-        <div className="hero-proof hero-proof-left"><span>BASELINE</span><strong>33.3%</strong><small>root-cause accuracy</small></div>
-        <div className="hero-proof hero-proof-right"><span>FAULTLINE</span><strong>100%</strong><small>causal proof rate</small></div>
+        <div className="hero-proof-row">
+          <div className="hero-proof"><span>BASELINE</span><strong>33.3%</strong><small>root-cause accuracy</small></div>
+          <div className="hero-proof"><span>FAULTLINE</span><strong>100%</strong><small>causal proof rate</small></div>
+        </div>
       </section>
 
       <section id="system" className="intro-section scroll-reveal">
@@ -73,17 +72,27 @@ export default function LandingPage() {
         <article className="value-card value-card-purple"><span className="card-number">03</span><h3>Every incident compounds</h3><p>Proof becomes a postmortem. Recovery becomes a runbook. Failure becomes a test.</p><div className="memory-lines"><i /><i /><i /><i /></div></article>
       </section>
 
-      <div className="credibility-strip scroll-reveal"><span>12 FIXED INCIDENTS</span><span>100% ACTION CONTAINMENT</span><span>APPEND-ONLY TRAJECTORIES</span><span>ZERO PRODUCTION CONNECTIONS</span><span>REPRODUCIBLE IN &lt; 1 SEC</span></div>
+      <div className="credibility-strip scroll-reveal"><span>12 SYNTHETIC INCIDENTS</span><span>100% ACTION CONTAINMENT</span><span>APPEND-ONLY TRAJECTORIES</span><span>ZERO PRODUCTION CONNECTIONS</span><span>REPLAY SUITE &lt; 1 SEC</span></div>
+
+      <section className="evaluation-section scroll-reveal" aria-labelledby="evaluation-heading">
+        <div className="evaluation-heading"><span className="section-index">02 / VERIFIABLE BY DESIGN</span><h2 id="evaluation-heading">Built to survive a judge’s clean-room test.</h2><p>The product, benchmark, and repository tell the same story. Every claim has a runnable path to evidence.</p></div>
+        <div className="evaluation-grid">
+          <article><span>01</span><small>AGENT SOLUTION &amp; ENGINEERING</small><h3>Purposeful tool use</h3><p>Competing hypotheses, contradiction checks, isolated interventions, and a skeptical verifier—not a decorated chatbot.</p></article>
+          <article><span>02</span><small>REPRODUCIBILITY</small><h3>One-command replay</h3><p>Versioned synthetic inputs, exact commands, expected outputs, tests, and inspectable JSONL trajectories.</p></article>
+          <article><span>03</span><small>MEASURED IMPROVEMENT</small><h3>Same cases. Fair baseline.</h3><p>Top-1 accuracy moves from 33.3% to 100%; every iteration is connected to evidence in the changelog.</p></article>
+          <article><span>04</span><small>END-TO-END QUALITY</small><h3>Useful after diagnosis</h3><p>Proof flows into rehearsal, human approval, postmortem evidence, and a reusable regression runbook.</p></article>
+        </div>
+      </section>
 
       <section id="proof" className="lifecycle-section">
-        <div className="lifecycle-intro scroll-reveal"><span className="section-index">02 / THE WORKFLOW</span><h2>One agentic loop.<br />Five operational outcomes.</h2><p>Not a collection of AI features. One coherent system whose stages verify one another.</p></div>
+        <div className="lifecycle-intro scroll-reveal"><span className="section-index">03 / THE WORKFLOW</span><h2>One agentic loop.<br />Four operational outcomes.</h2><p>Not a collection of AI features. One coherent system whose stages verify one another.</p></div>
         <div className="lifecycle-stack">
           {lifecycle.map((item) => <article className="lifecycle-card scroll-reveal" key={item.step}><span>{item.step}</span><div><small>FAULTLINE STAGE</small><h3>{item.title}</h3><p>{item.copy}</p></div><b>↗</b></article>)}
         </div>
       </section>
 
       <section id="benchmark" className="hard-case-section scroll-reveal">
-        <div className="hard-case-copy"><span className="section-index">03 / THE HARD CASE</span><h2>The obvious answer is wrong.<br />Faultline proves why.</h2><p>A checkout canary begins just before regional packet loss. A normal assistant blames the deploy. Faultline tests it—and learns from being wrong.</p><Link className="pill-button pill-light" href="/dashboard">Watch the investigation</Link></div>
+        <div className="hard-case-copy"><span className="section-index">04 / THE HARD CASE</span><h2>The obvious answer is wrong.<br />Faultline proves why.</h2><p>A checkout canary begins just before regional packet loss. A normal assistant blames the deploy. Faultline tests it—and learns from being wrong.</p><Link className="pill-button pill-light" href="/dashboard">Watch the investigation</Link></div>
         <div className="experiment-board">
           <div className="experiment-head"><span>INC-2492 / EU-SOUTH</span><b>COUNTERFACTUAL LOG</b></div>
           <article><span>CF-01</span><div><small>CHECKOUT ROLLBACK</small><strong>19% → 19%</strong><p>Packet loss survives. Hypothesis rejected.</p></div><b className="reject">REJECTED</b></article>

@@ -13,7 +13,7 @@ test("ships the animated Faultline product and command center instead of starter
   ]);
 
   assert.match(page, /Incidents don’t need another explanation/);
-  assert.match(page, /FaultlineScene/);
+  assert.doesNotMatch(page, /FaultlineScene|three/);
   assert.match(page, /gsap/);
   assert.match(dashboard, /AUTONOMOUS REPLAY/);
   assert.match(dashboard, /investigateIncident\(selectedId, false/);

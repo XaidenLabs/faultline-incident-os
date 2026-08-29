@@ -21,7 +21,7 @@ pnpm --version
 ## 2. Install
 
 ```bash
-git clone <submission-repository-url> faultline
+git clone https://github.com/XaidenLabs/faultline-incident-os.git faultline
 cd faultline
 pnpm install --frozen-lockfile
 ```
