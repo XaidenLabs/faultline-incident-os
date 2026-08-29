@@ -1,5 +1,6 @@
 // @ts-expect-error The replay dataset is intentionally versioned as ESM JavaScript.
 import { publicScenario, scenarios } from "../../../core/scenarios.mjs";
+import { hasPersistentStore, listIncidents, syncIncidents, type StoredIncident } from "../../lib/faultline-store";
 
 type Candidate = { service: string; errorRate: number; signal: string };
 type Scenario = {
@@ -13,7 +14,7 @@ type Scenario = {
 };
 
 export async function GET() {
-  const incidents = (scenarios as Scenario[]).map((scenario) => {
+  const sourceIncidents = (scenarios as Scenario[]).map((scenario) => {
     const visible = publicScenario(scenario) as Scenario;
     const peak = Math.max(...visible.candidates.map((candidate) => candidate.errorRate));
     const services = new Set(visible.topology.flatMap((edge) => edge.split(">")));
@@ -29,6 +30,15 @@ export async function GET() {
       changes: visible.changes,
       allowedActionCount: visible.allowedActions.length,
     };
-  });
-  return Response.json({ incidents });
+  }) satisfies StoredIncident[];
+
+  if (!hasPersistentStore) return Response.json({ incidents: sourceIncidents, persistence: "local" });
+
+  try {
+    await syncIncidents(sourceIncidents);
+    return Response.json({ incidents: await listIncidents(), persistence: "supabase" });
+  } catch (error) {
+    console.error("Faultline incident sync failed", error);
+    return Response.json({ incidents: sourceIncidents, persistence: "degraded" });
+  }
 }

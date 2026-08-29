@@ -15,7 +15,9 @@ test("ships the animated Faultline product and command center instead of starter
   assert.match(page, /Incidents don’t need another explanation/);
   assert.match(page, /FaultlineScene/);
   assert.match(page, /gsap/);
-  assert.match(dashboard, /Run investigation/);
+  assert.match(dashboard, /AUTONOMOUS REPLAY/);
+  assert.match(dashboard, /investigateIncident\(selectedId, false/);
+  assert.match(dashboard, />Re-run</);
   assert.match(dashboard, /RECOVERY PLAN/);
   assert.match(dashboard, /RUNBOOK MEMORY/);
   assert.match(dashboard, /fetch\("\/api\/incidents"/);
