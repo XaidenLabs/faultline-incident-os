@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
 
 type Phase = "idle" | "running" | "ready" | "recovering" | "resolved";
-type Panel = "investigation" | "trajectory" | "benchmark";
+type Panel = "investigation" | "trajectory" | "recovery" | "postmortem" | "runbook" | "benchmark";
 
 type TraceStep = {
   id: string;
@@ -139,9 +139,12 @@ export default function Home() {
         </div>
 
         <nav className="primary-nav" aria-label="Primary navigation">
-          <button className="nav-button nav-active"><span className="nav-glyph">⌁</span> Incident room</button>
-          <button className="nav-button" onClick={() => setPanel("benchmark")}><span className="nav-glyph">↗</span> Evaluations</button>
-          <button className="nav-button" onClick={() => setPanel("trajectory")}><span className="nav-glyph">⋮</span> Trajectories</button>
+          <button className={`nav-button ${panel === "investigation" ? "nav-active" : ""}`} onClick={() => setPanel("investigation")}><span className="nav-glyph">⌁</span> Investigation</button>
+          <button className={`nav-button ${panel === "recovery" ? "nav-active" : ""}`} onClick={() => setPanel("recovery")}><span className="nav-glyph">↺</span> Recovery lab</button>
+          <button className={`nav-button ${panel === "postmortem" ? "nav-active" : ""}`} onClick={() => setPanel("postmortem")}><span className="nav-glyph">▤</span> Postmortem</button>
+          <button className={`nav-button ${panel === "runbook" ? "nav-active" : ""}`} onClick={() => setPanel("runbook")}><span className="nav-glyph">◇</span> Runbook memory</button>
+          <button className={`nav-button ${panel === "benchmark" ? "nav-active" : ""}`} onClick={() => setPanel("benchmark")}><span className="nav-glyph">↗</span> Evaluations</button>
+          <button className={`nav-button ${panel === "trajectory" ? "nav-active" : ""}`} onClick={() => setPanel("trajectory")}><span className="nav-glyph">⋮</span> Audit trail</button>
         </nav>
 
         <div className="sidebar-label">OPEN INCIDENTS <span>3</span></div>
@@ -315,6 +318,62 @@ export default function Home() {
                 ))}
               </div>
               <p className="provisional-note"><strong>Evaluation contract:</strong> Fixed synthetic cases and hidden answer labels. Faultline receives an isolated action catalog, runs one-variable experiments, and must clear the symptom without regressions. The regional packet-loss challenge requires one failed experiment before the correct proof. Raw before/after artifacts ship with the repository.</p>
+            </section>
+          )}
+
+          {panel === "recovery" && (
+            <section className="operations-panel surface">
+              <div className="panel-heading">
+                <div><span className="section-kicker">RECOVERY LAB · ACTION R-17</span><h2>Rehearse the fix before production</h2></div>
+                <Mark tone={investigationComplete ? "good" : "amber"}>{investigationComplete ? "4 / 4 GATES PASS" : "PROOF REQUIRED"}</Mark>
+              </div>
+              <div className="operation-summary">
+                <div><small>PROPOSED ACTION</small><strong>Revert PAYMENT_TIMEOUT_MS to 2500</strong><span>checkout-service · eu-west · reversible</span></div>
+                <div><small>RISK</small><strong>LOW</strong><span>Scoped configuration change</span></div>
+                <div><small>PRODUCTION</small><strong>NOT TOUCHED</strong><span>Human approval required</span></div>
+              </div>
+              <div className="gate-list">
+                {[
+                  ["Original symptom cleared", "34.8% → 0.8% errors"],
+                  ["Service health restored", "33 → 96 health score"],
+                  ["No unrelated regressions", "0 failing secondary checks"],
+                  ["Production isolation", "productionConnected=false"],
+                ].map(([name, observed]) => <div key={name}><span>✓</span><div><strong>{name}</strong><small>{observed}</small></div><Mark tone="good">PASS</Mark></div>)}
+              </div>
+              <div className="approval-strip"><div><small>ROLLBACK CONDITION</small><strong>Abort if any health gate regresses or errors remain above 1%.</strong></div><button className="primary-button" disabled={!investigationComplete}>Request on-call approval <span>→</span></button></div>
+            </section>
+          )}
+
+          {panel === "postmortem" && (
+            <section className="operations-panel surface">
+              <div className="panel-heading">
+                <div><span className="section-kicker">EVIDENCE-BACKED POSTMORTEM</span><h2>The report writes itself from the trajectory</h2></div>
+                <button className="secondary-button">Export Markdown</button>
+              </div>
+              <div className="postmortem-grid">
+                <article><small>WHAT HAPPENED</small><h3>Malformed timeout configuration caused an immediate downstream cancellation cascade.</h3><p>Config v47 changed an integer timeout to an unsupported duration string. The parser fell back to zero, so checkout cancelled payment calls before they could complete.</p></article>
+                <article><small>EXECUTABLE PROOF</small><h3>One variable changed. The failure disappeared.</h3><p>CF-01 reverted only PAYMENT_TIMEOUT_MS. Error rate fell from 34.8% to 0.8%, health rose to 96, and no unrelated check regressed.</p></article>
+                <article><small>ALTERNATIVES REJECTED</small><ul><li>Payment saturation — healthy before checkout cancellation</li><li>Currency timeout — remained within SLO</li></ul></article>
+                <article><small>LIMITATIONS</small><ul><li>Synthetic deterministic snapshot</li><li>No production action executed</li><li>Organizational impact not estimated</li></ul></article>
+              </div>
+              <p className="provisional-note"><strong>Integrity:</strong> Every material sentence links back to telemetry or a counterfactual experiment. The exported package includes an append-only trajectory and SHA-256 audit digest.</p>
+            </section>
+          )}
+
+          {panel === "runbook" && (
+            <section className="operations-panel surface">
+              <div className="panel-heading">
+                <div><span className="section-kicker">RUNBOOK MEMORY · RB-2481-CHECKOUT</span><h2>Every resolved incident becomes a regression guard</h2></div>
+                <Mark tone="good">COMPILED</Mark>
+              </div>
+              <div className="runbook-flow">
+                <article><span>01</span><small>TRIGGER</small><h3>Checkout errors rise after a timeout configuration change</h3><p>Match topology, parser log signature, and propagation order.</p></article>
+                <b>→</b>
+                <article><span>02</span><small>VERIFY</small><h3>Replay the scoped config reversal</h3><p>Require errors ≤ 1%, health ≥ 90, and zero secondary regressions.</p></article>
+                <b>→</b>
+                <article><span>03</span><small>RECOVER</small><h3>Propose the catalog-bound rollback</h3><p>Never auto-execute. Route the proof package to the on-call approver.</p></article>
+              </div>
+              <div className="regression-spec"><div><small>MACHINE-READABLE ASSERTION</small><code>revert-config-key must clear INC-2481 with error_rate_pct &lt;= 1</code></div><button className="secondary-button">Open JSON artifact</button></div>
             </section>
           )}
         </div>

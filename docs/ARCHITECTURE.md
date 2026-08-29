@@ -4,6 +4,8 @@
 
 Faultline consumes a bounded incident bundle and returns a diagnosis package. It does not connect to production infrastructure in this submission.
 
+The shipped product boundary is broader than diagnosis: `core/incident-os.mjs` orchestrates the complete observe-to-learn lifecycle and emits an auditable incident package containing intake, investigation, counterfactuals, recovery rehearsal, approval state, postmortem, and compiled runbook.
+
 ```text
 Incident bundle
   ├─ topology

@@ -1,0 +1,385 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-08-29T19:05:32.255Z",
+  "mode": "synthetic-isolated-replay",
+  "incident": {
+    "id": "INC-2481",
+    "title": "Checkout failures after configuration rollout",
+    "symptom": "34.8% checkout failure rate in eu-west",
+    "severity": "SEV-2",
+    "status": "normalized",
+    "blastRadius": {
+      "services": [
+        "checkout-service",
+        "payment-service",
+        "currency-service",
+        "frontend",
+        "checkout",
+        "payment",
+        "currency",
+        "email"
+      ],
+      "serviceCount": 8
+    },
+    "evidenceSources": [
+      "metrics",
+      "logs",
+      "traces",
+      "changes",
+      "topology"
+    ],
+    "allowedActionCount": 2
+  },
+  "lifecycle": {
+    "observe": "normalized",
+    "investigate": "complete",
+    "prove": "passed",
+    "rehearse": "passed",
+    "approve": "awaiting-human",
+    "learn": "compiled"
+  },
+  "investigation": {
+    "rootService": "checkout-service",
+    "confidence": 96,
+    "evidence": [
+      "checkout-service config v47: PAYMENT_TIMEOUT_MS 2500 -> '2.5s' at 14:05:36Z",
+      "checkout: invalid integer '2.5s'; using fallback 0",
+      "payment: context deadline exceeded from checkout",
+      "frontend 502 @14:07:12",
+      "checkout timeout @14:07:12",
+      "payment cancelled @14:07:12.004"
+    ],
+    "rejectedHypotheses": [],
+    "counterfactuals": [
+      {
+        "hypothesis": "checkout-service",
+        "experimentId": "INC-2481-CF-01",
+        "action": "checkout-service:revert-config-key",
+        "changedVariable": "revert-config-key",
+        "accepted": true,
+        "isolation": "fresh synthetic snapshot",
+        "productionConnected": false,
+        "before": {
+          "healthScore": 33,
+          "errorRatePct": 34.8,
+          "sloErrorBudgetPct": 1,
+          "failingChecks": [
+            "34.8% checkout failure rate in eu-west"
+          ],
+          "symptom": "34.8% checkout failure rate in eu-west"
+        },
+        "after": {
+          "healthScore": 96,
+          "errorRatePct": 0.8,
+          "sloErrorBudgetPct": 1,
+          "failingChecks": [],
+          "symptom": "cleared"
+        },
+        "effect": {
+          "healthDelta": 63,
+          "errorReductionPct": 97.7,
+          "symptomCleared": true,
+          "unrelatedRegressions": 0
+        },
+        "verdict": "causal"
+      }
+    ],
+    "trajectory": [
+      {
+        "at": "2026-08-29T19:05:32.257Z",
+        "actor": "investigator",
+        "action": "inventory_fault_surface",
+        "output": {
+          "symptom": "34.8% checkout failure rate in eu-west",
+          "services": [
+            "checkout-service",
+            "payment-service",
+            "currency-service"
+          ],
+          "topology": [
+            "frontend>checkout",
+            "checkout>payment",
+            "checkout>currency",
+            "checkout>email"
+          ]
+        }
+      },
+      {
+        "at": "2026-08-29T19:05:32.257Z",
+        "actor": "investigator",
+        "action": "open_competing_hypotheses",
+        "output": [
+          {
+            "service": "checkout-service",
+            "score": 89,
+            "supporting": [
+              "PAYMENT_TIMEOUT_MS parsed as 0"
+            ],
+            "contradicting": 0
+          },
+          {
+            "service": "currency-service",
+            "score": -8.4,
+            "supporting": [
+              "latency within SLO"
+            ],
+            "contradicting": 2
+          },
+          {
+            "service": "payment-service",
+            "score": -28,
+            "supporting": [
+              "downstream deadline exceeded"
+            ],
+            "contradicting": 3
+          }
+        ]
+      },
+      {
+        "at": "2026-08-29T19:05:32.257Z",
+        "actor": "tool",
+        "action": "inspect_recent_changes",
+        "output": [
+          "checkout-service config v47: PAYMENT_TIMEOUT_MS 2500 -> '2.5s' at 14:05:36Z"
+        ]
+      },
+      {
+        "at": "2026-08-29T19:05:32.257Z",
+        "actor": "tool",
+        "action": "query_logs",
+        "output": [
+          "checkout: invalid integer '2.5s'; using fallback 0",
+          "payment: context deadline exceeded from checkout"
+        ]
+      },
+      {
+        "at": "2026-08-29T19:05:32.257Z",
+        "actor": "tool",
+        "action": "inspect_trace_path",
+        "output": [
+          "frontend 502 @14:07:12",
+          "checkout timeout @14:07:12",
+          "payment cancelled @14:07:12.004"
+        ]
+      },
+      {
+        "at": "2026-08-29T19:05:32.257Z",
+        "actor": "verifier",
+        "action": "falsify_leading_hypothesis",
+        "output": {
+          "target": "checkout-service",
+          "strongestAlternative": "currency-service",
+          "margin": 97.4,
+          "survived": true,
+          "checks": [
+            "temporal precedence",
+            "cross-service propagation",
+            "contradicting observations"
+          ]
+        }
+      },
+      {
+        "at": "2026-08-29T19:05:32.257Z",
+        "actor": "sandbox",
+        "action": "snapshot_incident_state",
+        "output": {
+          "incident": "INC-2481",
+          "isolation": "fresh synthetic snapshot per experiment",
+          "productionConnected": false,
+          "baseline": {
+            "healthScore": 33,
+            "errorRatePct": 34.8,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [
+              "34.8% checkout failure rate in eu-west"
+            ],
+            "symptom": "34.8% checkout failure rate in eu-west"
+          }
+        }
+      },
+      {
+        "at": "2026-08-29T19:05:32.258Z",
+        "actor": "sandbox",
+        "action": "run_counterfactual",
+        "output": {
+          "hypothesis": "checkout-service",
+          "experimentId": "INC-2481-CF-01",
+          "action": "checkout-service:revert-config-key",
+          "changedVariable": "revert-config-key",
+          "accepted": true,
+          "isolation": "fresh synthetic snapshot",
+          "productionConnected": false,
+          "before": {
+            "healthScore": 33,
+            "errorRatePct": 34.8,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [
+              "34.8% checkout failure rate in eu-west"
+            ],
+            "symptom": "34.8% checkout failure rate in eu-west"
+          },
+          "after": {
+            "healthScore": 96,
+            "errorRatePct": 0.8,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [],
+            "symptom": "cleared"
+          },
+          "effect": {
+            "healthDelta": 63,
+            "errorReductionPct": 97.7,
+            "symptomCleared": true,
+            "unrelatedRegressions": 0
+          },
+          "verdict": "causal"
+        }
+      },
+      {
+        "at": "2026-08-29T19:05:32.258Z",
+        "actor": "verifier",
+        "action": "verify_causal_proof",
+        "output": {
+          "service": "checkout-service",
+          "action": "checkout-service:revert-config-key",
+          "proven": true,
+          "rejectedHypotheses": [],
+          "acceptanceRule": "symptom clears, health improves, and no unrelated regression appears"
+        }
+      },
+      {
+        "at": "2026-08-29T19:05:32.258Z",
+        "actor": "verifier",
+        "action": "validate_recovery_action",
+        "output": {
+          "service": "checkout-service",
+          "action": "checkout-service:revert-config-key",
+          "allowed": true,
+          "humanApprovalRequired": true,
+          "executedInProduction": false
+        }
+      }
+    ]
+  },
+  "recovery": {
+    "status": "proposed",
+    "action": "checkout-service:revert-config-key",
+    "target": "checkout-service",
+    "scope": "incident-scoped checkout-service recovery",
+    "rationale": "The same intervention cleared the original symptom in an isolated fresh snapshot.",
+    "risk": {
+      "level": "low",
+      "reason": "Scoped reversible action with a verified rollback gate."
+    },
+    "rollbackCondition": "Any health gate regresses or the original symptom remains above its SLO threshold.",
+    "constraints": {
+      "catalogBound": true,
+      "productionExecuted": false
+    },
+    "approval": {
+      "required": true,
+      "role": "qualified on-call engineer",
+      "status": "awaiting-human"
+    }
+  },
+  "rehearsal": {
+    "status": "passed",
+    "experimentId": "INC-2481-CF-01",
+    "action": "checkout-service:revert-config-key",
+    "before": {
+      "healthScore": 33,
+      "errorRatePct": 34.8,
+      "sloErrorBudgetPct": 1,
+      "failingChecks": [
+        "34.8% checkout failure rate in eu-west"
+      ],
+      "symptom": "34.8% checkout failure rate in eu-west"
+    },
+    "after": {
+      "healthScore": 96,
+      "errorRatePct": 0.8,
+      "sloErrorBudgetPct": 1,
+      "failingChecks": [],
+      "symptom": "cleared"
+    },
+    "healthGates": [
+      {
+        "name": "original-symptom-cleared",
+        "passed": true,
+        "observed": "34.8% → 0.8% errors"
+      },
+      {
+        "name": "service-health-restored",
+        "passed": true,
+        "observed": "33 → 96 health score"
+      },
+      {
+        "name": "no-unrelated-regressions",
+        "passed": true,
+        "observed": "0 regression(s)"
+      },
+      {
+        "name": "production-isolation",
+        "passed": true,
+        "observed": "productionConnected=false"
+      }
+    ],
+    "productionConnected": false
+  },
+  "postmortem": {
+    "status": "evidence-backed",
+    "summary": "34.8% checkout failure rate in eu-west. The verified causal service was checkout-service.",
+    "proof": "checkout-service:revert-config-key changed one variable in INC-2481-CF-01; error rate moved from 34.8% to 0.8% with no unrelated regressions.",
+    "alternativesRejected": [],
+    "evidence": [
+      "checkout-service config v47: PAYMENT_TIMEOUT_MS 2500 -> '2.5s' at 14:05:36Z",
+      "checkout: invalid integer '2.5s'; using fallback 0",
+      "payment: context deadline exceeded from checkout",
+      "frontend 502 @14:07:12",
+      "checkout timeout @14:07:12",
+      "payment cancelled @14:07:12.004"
+    ],
+    "limitations": [
+      "Synthetic deterministic incident snapshot.",
+      "Production execution and organizational impact estimation are outside this submission."
+    ]
+  },
+  "runbook": {
+    "id": "RB-2481-CHECKOUT-SERVICE",
+    "status": "compiled",
+    "trigger": "34.8% checkout failure rate in eu-west",
+    "verify": {
+      "requiredEvidence": [
+        "checkout-service config v47: PAYMENT_TIMEOUT_MS 2500 -> '2.5s' at 14:05:36Z",
+        "checkout: invalid integer '2.5s'; using fallback 0",
+        "payment: context deadline exceeded from checkout",
+        "frontend 502 @14:07:12",
+        "checkout timeout @14:07:12",
+        "payment cancelled @14:07:12.004"
+      ],
+      "counterfactualAction": "checkout-service:revert-config-key",
+      "acceptanceRule": "Original symptom clears, health score >= 90, and unrelated regressions = 0."
+    },
+    "recover": {
+      "action": "checkout-service:revert-config-key",
+      "approvalRequired": true,
+      "autoExecute": false
+    },
+    "regressionTest": {
+      "fixture": "INC-2481",
+      "assertion": "checkout-service:revert-config-key must clear 34.8% checkout failure rate in eu-west",
+      "expectedMaxErrorRatePct": 1
+    }
+  },
+  "audit": {
+    "algorithm": "sha256",
+    "sha256": "a21361f29d4500a84c7ae07a2b5820d35e5d74504fbf8a99707ef4808d81534a",
+    "appendOnlyTrajectoryEvents": 10,
+    "artifactTypes": [
+      "incident-package",
+      "counterfactual-proof",
+      "recovery-plan",
+      "postmortem",
+      "runbook"
+    ]
+  }
+}

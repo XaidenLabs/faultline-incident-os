@@ -4,6 +4,20 @@
 
 Faultline is a counterfactual incident laboratory for on-call engineers. It reconstructs candidate causal chains from telemetry, then changes one suspected cause at a time in an isolated incident snapshot and replays the failure. A diagnosis is promoted only when that single intervention clears the symptom without creating another regression.
 
+The laboratory is the proof engine inside a larger incident-response operating system:
+
+```text
+Observe → Investigate → Prove → Rehearse → Approve → Learn
+```
+
+- **Incident intake** normalizes fragmented telemetry into one bounded fault surface and blast radius.
+- **Counterfactual investigation** competes hypotheses and runs one-variable experiments.
+- **Recovery Lab** turns the proven intervention into a scoped plan with risk and rollback gates.
+- **Health-gated rehearsal** measures the recovery against the original symptom, service health, regressions, and production isolation.
+- **Evidence-backed postmortem** writes the causal proof and rejected alternatives from the trajectory rather than inventing a retrospective story.
+- **Runbook Memory** compiles every successful recovery into a machine-readable regression guard for the next incident.
+- **Evaluation Lab** compares the simple baseline, advanced workflow, proof rate, action validity, and experiment efficiency across fixed cases.
+
 ## The user and the bottleneck
 
 Site reliability engineers and software engineers on call must diagnose production incidents while evidence is fragmented across metrics, logs, traces, deploy history, service topology, and runbooks. The component with the loudest error is often only a downstream victim. Under time pressure, both people and general-purpose assistants can collapse too quickly on the first plausible explanation.
@@ -72,6 +86,7 @@ Requirements:
 pnpm install --frozen-lockfile
 pnpm test
 pnpm evaluate:replay
+pnpm demo:full
 pnpm dev
 ```
 
@@ -95,11 +110,14 @@ app/                         Interactive incident room
 core/scenarios.mjs           Versioned synthetic incident bundles
 core/replay-agent.mjs        Credential-free baseline and advanced replay
 core/sandbox.mjs             Isolated counterfactual experiment engine
+core/incident-os.mjs         Full observe-to-learn incident lifecycle
+core/run-full-demo.mjs       Reproducible incident-package generator
 core/live-agent.mjs          Responses API tool loop and trace recorder
 core/prompts.mjs             Complete agent instructions
 core/evaluate.mjs            Repeatable evaluation runner
 artifacts/evaluation/        Raw evaluation output
 artifacts/trajectories/      Representative JSONL trajectories
+artifacts/incident-packages/ Recovery, postmortem and runbook artifacts
 docs/                        Architecture and evaluation detail
 tests/                       Safety, trajectory, data and UI contracts
 ```

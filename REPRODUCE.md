@@ -87,7 +87,26 @@ Open the local URL printed by the server. The intended execution is:
 7. Confirm the status becomes **Resolved** and success becomes 99.97%.
 8. Open **Baseline comparison**.
 
+The sidebar also exposes the complete workflow:
+
+- **Recovery lab**: inspect the proposed action, risk, rollback condition and four rehearsal gates.
+- **Postmortem**: inspect the causal proof, rejected alternatives and evidence limitations.
+- **Runbook memory**: inspect the reusable trigger, verification rule, approval constraint and regression assertion.
+
 The displayed incident is synthetic and the recovery is a simulation. No production service is contacted.
+
+Generate the complete machine-readable and human-readable incident packages:
+
+```bash
+pnpm demo:full
+```
+
+Expected artifacts:
+
+- `artifacts/incident-packages/inc-2481.json`
+- `artifacts/incident-packages/inc-2481.md`
+- `artifacts/incident-packages/inc-2492.json`
+- `artifacts/incident-packages/inc-2492.md`
 
 ## 6. Run a live tool-using agent
 

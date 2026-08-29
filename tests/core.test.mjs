@@ -5,6 +5,7 @@ import { runBaseline, runFaultline } from "../core/replay-agent.mjs";
 import { createIncidentSandbox } from "../core/sandbox.mjs";
 import { executeTool } from "../core/live-agent.mjs";
 import { publicScenario } from "../core/scenarios.mjs";
+import { renderIncidentReport, runIncidentOS } from "../core/incident-os.mjs";
 
 test("ships at least ten evaluation cases with a challenging case", () => {
   assert.ok(scenarios.length >= 10);
@@ -77,4 +78,29 @@ test("advanced replay improves over the simple baseline", () => {
   const baselineCorrect = scenarios.filter((scenario) => runBaseline(scenario).service === scenario.gold.service).length;
   const faultlineCorrect = scenarios.filter((scenario) => runFaultline(scenario).service === scenario.gold.service).length;
   assert.ok(faultlineCorrect > baselineCorrect, `${faultlineCorrect} should exceed ${baselineCorrect}`);
+});
+
+test("the full incident lifecycle closes with inspectable operational artifacts", () => {
+  const pkg = runIncidentOS(scenarios[0], { now: "2026-08-29T00:00:00.000Z" });
+  assert.deepEqual(pkg.lifecycle, {
+    observe: "normalized",
+    investigate: "complete",
+    prove: "passed",
+    rehearse: "passed",
+    approve: "awaiting-human",
+    learn: "compiled",
+  });
+  assert.equal(pkg.recovery.constraints.productionExecuted, false);
+  assert.equal(pkg.rehearsal.healthGates.every((gate) => gate.passed), true);
+  assert.equal(pkg.runbook.recover.autoExecute, false);
+  assert.match(pkg.audit.sha256, /^[a-f0-9]{64}$/);
+});
+
+test("the incident report turns a failed experiment into retained learning", () => {
+  const hardCase = scenarios.find((scenario) => scenario.id === "INC-2492");
+  const pkg = runIncidentOS(hardCase, { now: "2026-08-29T00:00:00.000Z" });
+  const report = renderIncidentReport(pkg);
+  assert.deepEqual(pkg.postmortem.alternativesRejected.map((item) => item.service), ["checkout"]);
+  assert.match(report, /Rejected alternatives: checkout/);
+  assert.match(report, /Reusable runbook/);
 });

@@ -1,0 +1,454 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-08-29T19:05:32.264Z",
+  "mode": "synthetic-isolated-replay",
+  "incident": {
+    "id": "INC-2492",
+    "title": "Intermittent failures in eu-south",
+    "symptom": "multi-service packet loss around 7%",
+    "severity": "SEV-2",
+    "status": "normalized",
+    "blastRadius": {
+      "services": [
+        "checkout",
+        "network",
+        "gateway",
+        "catalog",
+        "shipping",
+        "services"
+      ],
+      "serviceCount": 6
+    },
+    "evidenceSources": [
+      "metrics",
+      "logs",
+      "traces",
+      "changes",
+      "topology"
+    ],
+    "allowedActionCount": 2
+  },
+  "lifecycle": {
+    "observe": "normalized",
+    "investigate": "complete",
+    "prove": "passed",
+    "rehearse": "passed",
+    "approve": "awaiting-human",
+    "learn": "compiled"
+  },
+  "investigation": {
+    "rootService": "network",
+    "confidence": 96,
+    "evidence": [
+      "checkout canary began 80s before alert; unrelated to dropped packets",
+      "multiple services: connection reset by peer",
+      "gaps occur on unrelated paths in same zone"
+    ],
+    "rejectedHypotheses": [
+      "checkout"
+    ],
+    "counterfactuals": [
+      {
+        "hypothesis": "checkout",
+        "experimentId": "INC-2492-CF-02",
+        "action": "checkout:rollback-canary",
+        "changedVariable": "rollback-canary",
+        "accepted": true,
+        "isolation": "fresh synthetic snapshot",
+        "productionConnected": false,
+        "before": {
+          "healthScore": 49,
+          "errorRatePct": 19,
+          "sloErrorBudgetPct": 1,
+          "failingChecks": [
+            "multi-service packet loss around 7%"
+          ],
+          "symptom": "multi-service packet loss around 7%"
+        },
+        "after": {
+          "healthScore": 49,
+          "errorRatePct": 19,
+          "sloErrorBudgetPct": 1,
+          "failingChecks": [
+            "multi-service packet loss around 7%"
+          ],
+          "symptom": "multi-service packet loss around 7%"
+        },
+        "effect": {
+          "healthDelta": 0,
+          "errorReductionPct": 0,
+          "symptomCleared": false,
+          "unrelatedRegressions": 0
+        },
+        "verdict": "rejected"
+      },
+      {
+        "hypothesis": "network",
+        "experimentId": "INC-2492-CF-01",
+        "action": "network:reroute-zone",
+        "changedVariable": "reroute-zone",
+        "accepted": true,
+        "isolation": "fresh synthetic snapshot",
+        "productionConnected": false,
+        "before": {
+          "healthScore": 49,
+          "errorRatePct": 19,
+          "sloErrorBudgetPct": 1,
+          "failingChecks": [
+            "multi-service packet loss around 7%"
+          ],
+          "symptom": "multi-service packet loss around 7%"
+        },
+        "after": {
+          "healthScore": 96,
+          "errorRatePct": 0.8,
+          "sloErrorBudgetPct": 1,
+          "failingChecks": [],
+          "symptom": "cleared"
+        },
+        "effect": {
+          "healthDelta": 47,
+          "errorReductionPct": 95.8,
+          "symptomCleared": true,
+          "unrelatedRegressions": 0
+        },
+        "verdict": "causal"
+      }
+    ],
+    "trajectory": [
+      {
+        "at": "2026-08-29T19:05:32.264Z",
+        "actor": "investigator",
+        "action": "inventory_fault_surface",
+        "output": {
+          "symptom": "multi-service packet loss around 7%",
+          "services": [
+            "checkout",
+            "network",
+            "gateway"
+          ],
+          "topology": [
+            "gateway>checkout",
+            "gateway>catalog",
+            "gateway>shipping",
+            "services>network"
+          ]
+        }
+      },
+      {
+        "at": "2026-08-29T19:05:32.264Z",
+        "actor": "investigator",
+        "action": "open_competing_hypotheses",
+        "output": [
+          {
+            "service": "checkout",
+            "score": 57.8,
+            "supporting": [
+              "largest visible error count"
+            ],
+            "contradicting": 0
+          },
+          {
+            "service": "network",
+            "score": 23.4,
+            "supporting": [
+              "loss shared across service boundaries"
+            ],
+            "contradicting": 1
+          },
+          {
+            "service": "gateway",
+            "score": 17.8,
+            "supporting": [
+              "retries hide some loss"
+            ],
+            "contradicting": 1
+          }
+        ]
+      },
+      {
+        "at": "2026-08-29T19:05:32.264Z",
+        "actor": "tool",
+        "action": "inspect_recent_changes",
+        "output": [
+          "checkout canary began 80s before alert; unrelated to dropped packets"
+        ]
+      },
+      {
+        "at": "2026-08-29T19:05:32.264Z",
+        "actor": "tool",
+        "action": "query_logs",
+        "output": [
+          "multiple services: connection reset by peer"
+        ]
+      },
+      {
+        "at": "2026-08-29T19:05:32.264Z",
+        "actor": "tool",
+        "action": "inspect_trace_path",
+        "output": [
+          "gaps occur on unrelated paths in same zone"
+        ]
+      },
+      {
+        "at": "2026-08-29T19:05:32.264Z",
+        "actor": "verifier",
+        "action": "falsify_leading_hypothesis",
+        "output": {
+          "target": "checkout",
+          "strongestAlternative": "network",
+          "margin": 34.4,
+          "survived": true,
+          "checks": [
+            "temporal precedence",
+            "cross-service propagation",
+            "contradicting observations"
+          ]
+        }
+      },
+      {
+        "at": "2026-08-29T19:05:32.264Z",
+        "actor": "sandbox",
+        "action": "snapshot_incident_state",
+        "output": {
+          "incident": "INC-2492",
+          "isolation": "fresh synthetic snapshot per experiment",
+          "productionConnected": false,
+          "baseline": {
+            "healthScore": 49,
+            "errorRatePct": 19,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [
+              "multi-service packet loss around 7%"
+            ],
+            "symptom": "multi-service packet loss around 7%"
+          }
+        }
+      },
+      {
+        "at": "2026-08-29T19:05:32.265Z",
+        "actor": "sandbox",
+        "action": "run_counterfactual",
+        "output": {
+          "hypothesis": "checkout",
+          "experimentId": "INC-2492-CF-02",
+          "action": "checkout:rollback-canary",
+          "changedVariable": "rollback-canary",
+          "accepted": true,
+          "isolation": "fresh synthetic snapshot",
+          "productionConnected": false,
+          "before": {
+            "healthScore": 49,
+            "errorRatePct": 19,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [
+              "multi-service packet loss around 7%"
+            ],
+            "symptom": "multi-service packet loss around 7%"
+          },
+          "after": {
+            "healthScore": 49,
+            "errorRatePct": 19,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [
+              "multi-service packet loss around 7%"
+            ],
+            "symptom": "multi-service packet loss around 7%"
+          },
+          "effect": {
+            "healthDelta": 0,
+            "errorReductionPct": 0,
+            "symptomCleared": false,
+            "unrelatedRegressions": 0
+          },
+          "verdict": "rejected"
+        }
+      },
+      {
+        "at": "2026-08-29T19:05:32.265Z",
+        "actor": "sandbox",
+        "action": "run_counterfactual",
+        "output": {
+          "hypothesis": "network",
+          "experimentId": "INC-2492-CF-01",
+          "action": "network:reroute-zone",
+          "changedVariable": "reroute-zone",
+          "accepted": true,
+          "isolation": "fresh synthetic snapshot",
+          "productionConnected": false,
+          "before": {
+            "healthScore": 49,
+            "errorRatePct": 19,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [
+              "multi-service packet loss around 7%"
+            ],
+            "symptom": "multi-service packet loss around 7%"
+          },
+          "after": {
+            "healthScore": 96,
+            "errorRatePct": 0.8,
+            "sloErrorBudgetPct": 1,
+            "failingChecks": [],
+            "symptom": "cleared"
+          },
+          "effect": {
+            "healthDelta": 47,
+            "errorReductionPct": 95.8,
+            "symptomCleared": true,
+            "unrelatedRegressions": 0
+          },
+          "verdict": "causal"
+        }
+      },
+      {
+        "at": "2026-08-29T19:05:32.265Z",
+        "actor": "verifier",
+        "action": "verify_causal_proof",
+        "output": {
+          "service": "network",
+          "action": "network:reroute-zone",
+          "proven": true,
+          "rejectedHypotheses": [
+            "checkout"
+          ],
+          "acceptanceRule": "symptom clears, health improves, and no unrelated regression appears"
+        }
+      },
+      {
+        "at": "2026-08-29T19:05:32.265Z",
+        "actor": "verifier",
+        "action": "validate_recovery_action",
+        "output": {
+          "service": "network",
+          "action": "network:reroute-zone",
+          "allowed": true,
+          "humanApprovalRequired": true,
+          "executedInProduction": false
+        }
+      }
+    ]
+  },
+  "recovery": {
+    "status": "proposed",
+    "action": "network:reroute-zone",
+    "target": "network",
+    "scope": "incident-scoped network recovery",
+    "rationale": "The same intervention cleared the original symptom in an isolated fresh snapshot.",
+    "risk": {
+      "level": "medium",
+      "reason": "Changes shared infrastructure state; staged approval required."
+    },
+    "rollbackCondition": "Any health gate regresses or the original symptom remains above its SLO threshold.",
+    "constraints": {
+      "catalogBound": true,
+      "productionExecuted": false
+    },
+    "approval": {
+      "required": true,
+      "role": "qualified on-call engineer",
+      "status": "awaiting-human"
+    }
+  },
+  "rehearsal": {
+    "status": "passed",
+    "experimentId": "INC-2492-CF-01",
+    "action": "network:reroute-zone",
+    "before": {
+      "healthScore": 49,
+      "errorRatePct": 19,
+      "sloErrorBudgetPct": 1,
+      "failingChecks": [
+        "multi-service packet loss around 7%"
+      ],
+      "symptom": "multi-service packet loss around 7%"
+    },
+    "after": {
+      "healthScore": 96,
+      "errorRatePct": 0.8,
+      "sloErrorBudgetPct": 1,
+      "failingChecks": [],
+      "symptom": "cleared"
+    },
+    "healthGates": [
+      {
+        "name": "original-symptom-cleared",
+        "passed": true,
+        "observed": "19% → 0.8% errors"
+      },
+      {
+        "name": "service-health-restored",
+        "passed": true,
+        "observed": "49 → 96 health score"
+      },
+      {
+        "name": "no-unrelated-regressions",
+        "passed": true,
+        "observed": "0 regression(s)"
+      },
+      {
+        "name": "production-isolation",
+        "passed": true,
+        "observed": "productionConnected=false"
+      }
+    ],
+    "productionConnected": false
+  },
+  "postmortem": {
+    "status": "evidence-backed",
+    "summary": "multi-service packet loss around 7%. The verified causal service was network.",
+    "proof": "network:reroute-zone changed one variable in INC-2492-CF-01; error rate moved from 19% to 0.8% with no unrelated regressions.",
+    "alternativesRejected": [
+      {
+        "service": "checkout",
+        "action": "checkout:rollback-canary",
+        "reason": "The symptom remained at 19% errors."
+      }
+    ],
+    "evidence": [
+      "checkout canary began 80s before alert; unrelated to dropped packets",
+      "multiple services: connection reset by peer",
+      "gaps occur on unrelated paths in same zone"
+    ],
+    "limitations": [
+      "Synthetic deterministic incident snapshot.",
+      "Production execution and organizational impact estimation are outside this submission."
+    ]
+  },
+  "runbook": {
+    "id": "RB-2492-NETWORK",
+    "status": "compiled",
+    "trigger": "multi-service packet loss around 7%",
+    "verify": {
+      "requiredEvidence": [
+        "checkout canary began 80s before alert; unrelated to dropped packets",
+        "multiple services: connection reset by peer",
+        "gaps occur on unrelated paths in same zone"
+      ],
+      "counterfactualAction": "network:reroute-zone",
+      "acceptanceRule": "Original symptom clears, health score >= 90, and unrelated regressions = 0."
+    },
+    "recover": {
+      "action": "network:reroute-zone",
+      "approvalRequired": true,
+      "autoExecute": false
+    },
+    "regressionTest": {
+      "fixture": "INC-2492",
+      "assertion": "network:reroute-zone must clear multi-service packet loss around 7%",
+      "expectedMaxErrorRatePct": 1
+    }
+  },
+  "audit": {
+    "algorithm": "sha256",
+    "sha256": "369788737d3bda6370976ebe01e905cb18458207a2f744f93873a7248536adbc",
+    "appendOnlyTrajectoryEvents": 11,
+    "artifactTypes": [
+      "incident-package",
+      "counterfactual-proof",
+      "recovery-plan",
+      "postmortem",
+      "runbook"
+    ]
+  }
+}
