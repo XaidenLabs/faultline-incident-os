@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { gsap } from "gsap";
 
@@ -187,6 +188,8 @@ export default function DashboardPage() {
               <article><small>PROOF</small><strong>{complete ? "Passed" : result ? "Verifying" : "Unproven"}</strong><span>{result ? `${result.investigation.counterfactuals.length} experiment(s)` : `${selected.allowedActionCount} allowed action(s)`}</span></article>
             </section>
 
+            <SignalChart candidates={selected.candidates} provenService={complete ? result?.investigation.rootService : undefined} />
+
             <div className="minimal-tabs m-enter">{(["proof", "recovery", "postmortem", "runbook"] as View[]).map((item) => <button key={item} className={view === item ? "active" : ""} onClick={() => setView(item)}>{item}</button>)}</div>
 
             {view === "proof" && <ProofView incident={selected} result={result} shownEvents={shownEvents} complete={Boolean(complete)} runState={runState} />}
@@ -206,6 +209,18 @@ export default function DashboardPage() {
       </aside>
     </main>
   );
+}
+
+function SignalChart({ candidates, provenService }: { candidates: Incident["candidates"]; provenService?: string }) {
+  const maxRate = Math.max(...candidates.map((candidate) => candidate.errorRate), 1);
+  return <section className="minimal-signal-chart m-enter" aria-label="Candidate service error rates">
+    <header><div><small>FAULT-SURFACE SIGNAL</small><strong>Visible errors by candidate service</strong></div><span>{candidates.length} candidates</span></header>
+    <div className="signal-bars">{candidates.map((candidate) => {
+      const height = Math.max(8, (candidate.errorRate / maxRate) * 100);
+      const proven = candidate.service === provenService;
+      return <div className={`signal-column ${proven ? "signal-proven" : ""}`} key={candidate.service} title={candidate.signal}><div className="signal-value" style={{ "--bar-height": `${height}%` } as CSSProperties}><span>{candidate.errorRate}%</span><i style={{ height: `${height}%` }} /></div><strong>{candidate.service}</strong>{proven && <small>PROVEN</small>}</div>;
+    })}</div>
+  </section>;
 }
 
 function ProofView({ incident, result, shownEvents, complete, runState }: { incident: Incident; result: InvestigationResult | null; shownEvents: InvestigationResult["investigation"]["trajectory"]; complete: boolean; runState: RunState }) {

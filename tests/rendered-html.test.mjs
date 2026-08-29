@@ -21,6 +21,8 @@ test("ships the animated Faultline product and command center instead of starter
   assert.match(dashboard, /fetch\("\/api\/incidents"/);
   assert.match(dashboard, /fetch\("\/api\/investigate"/);
   assert.match(dashboard, /drawer-toggle/);
+  assert.match(dashboard, /selected\.candidates/);
+  assert.match(dashboard, /SignalChart/);
   assert.doesNotMatch(dashboard, /Regional packet loss|19\.0%|INC-2492/);
   assert.match(incidentsApi, /scenarios/);
   assert.match(investigateApi, /runIncidentOS/);

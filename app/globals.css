@@ -234,6 +234,17 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .minimal-metrics article:last-child { border: 0; }
 .minimal-metrics small, .proof-outcome small, .experiment-list small, .minimal-artifact small, .minimal-copilot small { color: #675c6d; font: 7px var(--mono); letter-spacing: .08em; }
 .minimal-metrics strong { font: 500 17px var(--mono); }.minimal-metrics span { color: #645a6a; font-size: 8px; }
+.minimal-signal-chart { height: 220px; margin-top: 12px; padding: 15px 18px 13px; border: 1px solid var(--line); border-radius: 12px; background: radial-gradient(circle at 75% 0%, rgba(129,45,191,.12), transparent 38%), #100b14; overflow: hidden; }
+.minimal-signal-chart > header { height: 39px; display: flex; justify-content: space-between; align-items: flex-start; }
+.minimal-signal-chart header > div { display: grid; gap: 4px; }.minimal-signal-chart header small { color: #6d5d76; font: 7px var(--mono); letter-spacing: .09em; }.minimal-signal-chart header strong { font-size: 9px; }.minimal-signal-chart header > span { color: #665b6d; font: 7px var(--mono); }
+.signal-bars { height: 150px; display: flex; align-items: stretch; gap: clamp(10px, 3vw, 28px); border-bottom: 1px solid rgba(255,255,255,.08); background: repeating-linear-gradient(to bottom, transparent 0, transparent 36px, rgba(255,255,255,.035) 37px); }
+.signal-column { min-width: 0; flex: 1; display: grid; grid-template-rows: 1fr 22px; align-items: end; position: relative; }
+.signal-value { height: 112px; display: flex; align-items: end; justify-content: center; position: relative; }
+.signal-value > span { position: absolute; bottom: calc(var(--bar-height, 0%) + 5px); color: #8c7c96; font: 7px var(--mono); }
+.signal-value i { width: min(74%, 110px); min-height: 8px; display: block; border-radius: 5px 5px 0 0; background: linear-gradient(180deg, #a346ed, rgba(76,25,118,.3)); border-top: 1px solid #c877f6; box-shadow: 0 -8px 24px rgba(139,51,208,.1); transition: height .55s cubic-bezier(.2,.8,.2,1), background .35s ease; }
+.signal-column > strong { align-self: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; text-align: center; color: #766b7d; font: 7px var(--mono); }
+.signal-column > small { position: absolute; top: 3px; right: 3px; color: var(--green); font: 6px var(--mono); }
+.signal-column.signal-proven .signal-value i { background: linear-gradient(180deg, #62e3a3, rgba(38,113,78,.28)); border-color: #79efb7; box-shadow: 0 -8px 24px rgba(79,225,157,.13); }.signal-column.signal-proven > strong { color: #a3d7bd; }
 .minimal-tabs { margin: 18px 0 12px; display: flex; gap: 4px; overflow-x: auto; }
 .minimal-tabs button { min-height: 32px; padding: 0 12px; border: 0; border-radius: 7px; color: #6f6475; background: transparent; text-transform: capitalize; font-size: 9px; cursor: pointer; white-space: nowrap; }
 .minimal-tabs button:hover, .minimal-tabs button.active { color: white; background: #191020; }
@@ -286,6 +297,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   .minimal-content { padding: 25px 13px 50px; }
   .minimal-title { display: grid; gap: 20px; margin-bottom: 22px; }.minimal-title h1 { font-size: clamp(31px, 10vw, 45px); }.minimal-title p { font-size: 10px; }.minimal-run { width: 100%; }
   .minimal-metrics { grid-template-columns: 1fr 1fr; }.minimal-metrics article { min-height: 82px; }.minimal-metrics article:nth-child(2) { border-right: 0; }.minimal-metrics article:last-child { grid-column: 1 / -1; border-top: 1px solid var(--line); }
+  .minimal-signal-chart { height: 205px; padding-inline: 12px; }.signal-bars { height: 136px; gap: 8px; }.signal-value { height: 101px; }.signal-column > strong { font-size: 6px; }
   .proof-outcome { grid-template-columns: 1fr; gap: 12px; }.proof-outcome > b { transform: rotate(90deg); justify-self: start; }
   .experiment-list article { grid-template-columns: 1fr auto; }.experiment-change { grid-column: 1; }.experiment-list article > span { grid-column: 2; grid-row: 1; }
   .artifact-grid { grid-template-columns: 1fr; }.artifact-grid article { border-right: 0; }
