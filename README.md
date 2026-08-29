@@ -145,6 +145,7 @@ Main observed failure in the prior iteration: a recent change dominated the scor
 - [Architecture](docs/ARCHITECTURE.md)
 - [Evaluation contract](docs/EVALUATION.md)
 - [Agent trajectory guide](docs/AGENT_TRAJECTORIES.md)
+- [Five-minute demo pitch and visual direction](docs/DEMO_PITCH.md)
 - [Pre-existing work disclosure](docs/PREEXISTING_WORK.md)
 
 ## Research grounding
