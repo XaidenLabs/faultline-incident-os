@@ -101,6 +101,12 @@ export default function DashboardPage() {
     return () => { cancelled = true; };
   }, []);
 
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("mode") !== "proof-lab") return;
+    const timer = window.setTimeout(() => setMode("proof-lab"), 0);
+    return () => window.clearTimeout(timer);
+  }, []);
+
   const investigateIncident = useCallback(async (incidentId: string, rerun = false, signal?: AbortSignal) => {
     setView("proof");
     setResult(null);
@@ -203,20 +209,22 @@ export default function DashboardPage() {
         <nav className="minimal-nav">
           <small>WORKSPACE</small>
           <button className={mode === "live" ? "active" : ""} onClick={() => { setMode("live"); setNavOpen(false); }}>◉ <span>Live pulse</span></button>
-          <button className={mode === "proof-lab" && view === "proof" ? "active" : ""} onClick={() => { setMode("proof-lab"); setView("proof"); setNavOpen(false); }}>⌁ <span>Proof lab</span></button>
+          <button className={mode === "proof-lab" && view === "proof" ? "active" : ""} onClick={() => { setMode("proof-lab"); setView("proof"); setNavOpen(false); }}>⌁ <span>Counterfactual lab</span></button>
+          <Link href="/evidence">◎ <span>Evidence & method</span></Link>
+          <Link href="/docs">? <span>Plain-language guide</span></Link>
           <small>PROOF ARTIFACTS</small>
           <button className={mode === "proof-lab" && view === "recovery" ? "active" : ""} onClick={() => { setMode("proof-lab"); setView("recovery"); setNavOpen(false); }}>↺ <span>Recovery</span></button>
           <button className={mode === "proof-lab" && view === "postmortem" ? "active" : ""} onClick={() => { setMode("proof-lab"); setView("postmortem"); setNavOpen(false); }}>▤ <span>Postmortem</span></button>
           <button className={mode === "proof-lab" && view === "runbook" ? "active" : ""} onClick={() => { setMode("proof-lab"); setView("runbook"); setNavOpen(false); }}>◇ <span>Runbook</span></button>
         </nav>
         {mode === "proof-lab" && <div className="minimal-incidents"><small>PROOF CASES · {incidents.length}</small>{incidents.map((incident) => <button key={incident.id} className={incident.id === selectedId ? "active" : ""} onClick={() => chooseIncident(incident.id)}><span className={`severity severity-${incident.severity.at(-1)}`} /><div><strong>{incident.id}</strong><small>{incident.title}</small></div></button>)}</div>}
-        <div className="isolation-note"><span>✓</span><div><strong>{mode === "live" ? "Read-only observer" : "Safe proof lab"}</strong><small>{mode === "live" ? "Public signals · no external actions" : "Synthetic snapshots only"}</small></div></div>
+        <div className="isolation-note"><span>✓</span><div><strong>{mode === "live" ? "Read-only observer" : "Safe counterfactual lab"}</strong><small>{mode === "live" ? "Public evidence · no external actions" : "Fixed test cases · no production access"}</small></div></div>
       </aside>
 
       <section className="minimal-main">
         <header className="minimal-topbar">
-          <div><button className="drawer-toggle nav-toggle" onClick={() => setNavOpen(true)} aria-label="Open incident navigation">☰</button><span className="status-orb" /><strong>Faultline</strong><small>/ {mode === "live" ? "LIVE" : selected?.id ?? "PROOF LAB"}</small></div>
-          <div><button className="drawer-toggle" onClick={() => setCopilotOpen(true)} aria-label="Open proof copilot">✦</button><span className="dash-avatar">AD</span></div>
+          <div><button className="drawer-toggle nav-toggle" onClick={() => setNavOpen(true)} aria-label="Open incident navigation">☰</button><span className="status-orb" /><strong>Faultline</strong><small>/ {mode === "live" ? "LIVE" : selected?.id ?? "COUNTERFACTUAL LAB"}</small></div>
+          <div><button className="drawer-toggle" onClick={() => setCopilotOpen(true)} aria-label="Open investigation summary">✦</button><span className="dash-avatar">AD</span></div>
         </header>
 
         <div className="minimal-content">
@@ -224,7 +232,7 @@ export default function DashboardPage() {
           {runState === "loading" && <DashboardState title="Loading incidents" copy="Reading the versioned incident dataset…" />}
           {runState === "error" && <DashboardState title="The agent lost its connection" copy="Retry to resume this incident from its persisted queue state." action="Retry" onAction={() => selected ? void investigateIncident(selected.id).catch(() => setRunState("error")) : void loadIncidents()} />}
           {selected && runState !== "loading" && runState !== "error" && <>
-            <header className="minimal-title m-enter"><div><span className="minimal-chip">{selected.severity} · SYNTHETIC PROOF LAB</span><h1>{selected.title}</h1><p>{selected.symptom}</p></div><div className="agent-control"><div className="agent-live"><span /><div><strong>{runState === "running" ? "Agent investigating" : runState === "replaying" ? "Compiling proof" : complete ? "Agent complete" : "Agent standing by"}</strong><small>{persistence === "supabase" ? "Persistent queue · Supabase" : persistence === "degraded" ? "Persistence degraded" : "Ephemeral local run"}</small></div></div><button className="minimal-rerun" onClick={() => void rerunInvestigation()} disabled={runState === "running" || runState === "replaying"}>Re-run</button></div></header>
+            <header className="minimal-title m-enter"><div><span className="minimal-chip">{selected.severity} · FIXED COUNTERFACTUAL CASE</span><h1>{selected.title}</h1><p>{selected.symptom} This controlled case can be reset and tested without touching production.</p></div><div className="agent-control"><div className="agent-live"><span /><div><strong>{runState === "running" ? "Agent investigating" : runState === "replaying" ? "Compiling proof" : complete ? "Agent complete" : "Agent standing by"}</strong><small>{persistence === "supabase" ? "Persistent queue · Supabase" : persistence === "degraded" ? "Persistence degraded" : "Ephemeral local run"}</small></div></div><button className="minimal-rerun" onClick={() => void rerunInvestigation()} disabled={runState === "running" || runState === "replaying"}>Re-run</button></div></header>
 
             <section className="minimal-metrics m-enter">
               <article><small>PEAK SIGNAL</small><strong>{selected.peakErrorRate}%</strong><span>visible error rate</span></article>
@@ -244,13 +252,13 @@ export default function DashboardPage() {
       </section>
 
       <aside className={`minimal-copilot ${copilotOpen ? "drawer-open" : ""}`}>
-        <header><div><span className="copilot-orb">✦</span><div><strong>{mode === "live" ? "Live observer" : "Proof copilot"}</strong><small>{mode === "live" ? "REALTIME MEMORY" : selected?.id ?? "No incident selected"}</small></div></div><button onClick={() => setCopilotOpen(false)} aria-label="Close copilot">×</button></header>
+        <header><div><span className="copilot-orb">✦</span><div><strong>{mode === "live" ? "Live observer" : "Investigation summary"}</strong><small>{mode === "live" ? "REALTIME MEMORY" : selected?.id ?? "No incident selected"}</small></div></div><button onClick={() => setCopilotOpen(false)} aria-label="Close investigation summary">×</button></header>
         <section className="copilot-summary"><small>STATUS</small><strong>{mode === "live" ? "Watching public signals" : complete ? "Cause proven" : result ? "Proof in progress" : runState === "running" ? "Agent investigating" : "Agent standing by"}</strong><p>{mode === "live" ? "New GitHub, Cloudflare, and npm captures are written to Supabase every two minutes. Open Live Pulse to inspect the retained evidence." : result?.postmortem.proof ?? selected?.symptom ?? "Select an incident to begin."}</p></section>
         {mode === "proof-lab" && result && <>
           <section className="copilot-facts"><div><small>ROOT SERVICE</small><strong>{result.investigation.rootService}</strong></div><div><small>CONFIDENCE</small><strong>{result.investigation.confidence}%</strong></div></section>
           <section className="copilot-action"><small>PROPOSED RECOVERY</small><strong>{result.recovery.action ?? "Blocked"}</strong><span>{result.recovery.approval.status}</span></section>
         </>}
-        <div className="copilot-input"><textarea aria-label="Ask Proof Copilot" placeholder="Ask about the active proof…" /><button aria-label="Send message">↑</button></div>
+        <div className="copilot-boundary"><small>{mode === "live" ? "EVIDENCE BOUNDARY" : "TEST BOUNDARY"}</small><strong>{mode === "live" ? "Reports only what public sources say" : "Runs only inside fixed isolated cases"}</strong><Link href="/evidence">See what is real, tested, and limited →</Link></div>
       </aside>
     </main>
   );
