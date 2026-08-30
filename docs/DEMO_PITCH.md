@@ -1,126 +1,130 @@
 # Faultline Demo Pitch
 
-## The one-line pitch
+## One-line pitch
 
-Faultline is an agentic incident-response system that does not stop at a plausible root cause: it changes one suspected cause in an isolated snapshot, replays the failure, and promotes a diagnosis only when the incident disappears without a new regression.
+Faultline watches live incident signals, tests possible causes in a safe copy of the incident, and only calls something the root cause when changing it makes the failure disappear.
 
 ## Five-minute demo script
 
-Target runtime: **4:40–4:55**. Record at 1440×900 or 1920×1080, 16:9, with the browser at 100% zoom. Keep the cursor still unless it is performing the next deliberate action.
+Aim for **4:40–4:55**. Record in 16:9 at 1440×900 or 1920×1080. Keep the browser at 100% zoom. Move the cursor only when you need to click something.
 
-### 0:00–0:20 — Cold open: the failure of plausible answers
+### 0:00–0:20 — Start with the problem
 
-**Visual:** Open directly on the hard-case incident in the dashboard. Keep the checkout canary marker and regional error signal visible. Add a small overlay: `A recent deploy is not necessarily the cause.`
-
-**Say:**
-
-> At 14:07, checkout changes. Seconds later, four services begin failing across eu-south. Every obvious signal points at checkout—but the obvious answer is wrong. Today, incident tools summarize correlation. Faultline tests causality.
-
-### 0:20–0:40 — User, bottleneck, and value
-
-**Visual:** Briefly cut to the landing hero, then scroll only far enough to show “From alert to reusable operational memory.”
+**Show:** Open the hard case in Proof Lab. Keep the 19% checkout signal, checkout canary, and four affected services on screen. Add this small caption: `Loudest signal ≠ proven cause.`
 
 **Say:**
 
-> Faultline is built for the on-call engineer whose evidence is fragmented across metrics, logs, traces, deploys, topology, and runbooks. A confident wrong diagnosis wastes the recovery window. Faultline turns a plausible explanation into executable before-and-after proof—before recovery touches production.
+> An incident in eu-south is affecting four services. Checkout has the loudest error signal, and a checkout canary started eighty seconds before the alert. So checkout looks guilty. But the failures also cross service boundaries. Faultline does not guess which story is right. It tests both.
 
-### 0:40–1:05 — Live operational memory
+### 0:20–0:40 — Explain who it helps
 
-**Visual:** Open Live Pulse. Show the three real source cards, Realtime connection state, current incidents, and capture-history hashes.
-
-**Say:**
-
-> This is not a frozen dashboard. Every two minutes, Faultline captures the official GitHub, Cloudflare, and npm status feeds. Each snapshot and changed observation is timestamped in Supabase and streamed into the interface. Live Pulse reports only what the public evidence says and preserves exactly what the agent saw.
-
-### 1:05–1:25 — Baseline first
-
-**Visual:** Show the baseline comparison. Highlight `33.3% top-1 accuracy`, then the baseline rule: it selects the loudest visible error. Keep the numbers large and readable.
+**Show:** Cut to the landing page. Scroll to “From alert to reusable operational memory.”
 
 **Say:**
 
-> I built a fair baseline on the same twelve versioned synthetic incidents. It inspects the supplied summary once and chooses the loudest failing component. That is a reasonable first response—and it reaches only 33.3 percent top-one root-cause accuracy. It has no selective tools, hypothesis competition, action validation, or intervention.
+> Faultline is for the engineer handling an incident while evidence is spread across logs, metrics, traces, deploys, and runbooks. A confident but wrong answer wastes valuable recovery time. Faultline turns a likely cause into proof before anyone changes production.
 
-### 1:25–2:35 — Full realistic agent execution
+### 0:40–1:05 — Show the real live data
 
-**Visual:** Return to the hard case. Start or replay the investigation. Let trajectory events populate. Pause briefly on each of these moments: fault-surface inventory, competing hypotheses, contradiction check, `CF-01 rejected`, and `CF-02 causal`.
+**Show:** Open Live Pulse. Show the GitHub, Cloudflare, and npm cards, the Realtime status, the observation stream, and Capture History.
 
 **Say:**
 
-> Faultline begins by inventorying the whole fault surface and topology. It keeps multiple explanations alive, then asks what observation would most strongly contradict its leading diagnosis. The recent checkout canary is plausible, so the agent tests it first in a fresh isolated snapshot.
+> This dashboard is live. Every two minutes, Faultline reads the public GitHub, Cloudflare, and npm status feeds. It saves each snapshot in Supabase and updates the screen in real time. It also keeps a history, so we can always see exactly what the agent saw and when it saw it.
+
+### 1:05–1:25 — Show the baseline
+
+**Show:** Display the baseline comparison and highlight `33.3% top-1 accuracy`.
+
+**Say:**
+
+> First, I built a simple baseline and ran it on the same twelve test incidents. It chooses the component with the loudest visible error. That sounds reasonable, but it finds the correct root cause only 33.3 percent of the time. It can spot correlation, but it cannot prove cause and effect.
+
+### 1:25–2:35 — Run the hard case
+
+**Show:** Return to the hard case. Let the investigation play. Pause on the fault surface, competing ideas, failed checkout test, and successful network test.
+
+**Say:**
+
+> Faultline starts by looking at the full incident, not just the loudest alert. It checks the service map, recent changes, logs, and traces. Then it keeps more than one possible cause open.
 >
-> Rolling checkout back changes nothing: packet loss remains at nineteen percent. That failed experiment is not hidden; it becomes evidence, and the checkout hypothesis is rejected. The agent then tests the shared network path. Rerouting the affected zone drops the failure to 0.8 percent across all four services with no unrelated regression. That is the causal proof.
-
-### 2:35–3:15 — Engineering and safety
-
-**Visual:** Open Agent Trajectory and show the append-only event sequence and tool arguments. Then open Recovery Lab and show the action catalog, four rehearsal gates, production isolation, and human approval state.
-
-**Say:**
-
-> This is agentic because the model selects bounded tools, competes hypotheses, falsifies its own answer, performs isolated experiments, and passes the result to a skeptical verifier. Every query, tool argument, output, retry, and decision is preserved as an append-only trajectory.
+> Checkout is the first suspect, so Faultline tests it in a fresh, isolated copy of the incident. It rolls back the checkout canary. Nothing improves. The error rate stays at nineteen percent, so checkout is rejected as the cause.
 >
-> Consequential recovery is never autonomous. Proposed actions must exist in the incident’s allowlist, are rehearsed against symptom clearance, restored health, secondary regressions, and production isolation, and remain held for a qualified human approval.
+> Next, Faultline tests the shared network path. It reroutes the affected zone, and the error rate drops from nineteen percent to 0.8 percent. The failure clears across the affected services, and no new problem appears. Now we have proof that the network path caused the incident.
 
-### 3:15–3:50 — End-to-end outcome
+### 2:35–3:15 — Explain why it is agentic and safe
 
-**Visual:** Show Postmortem, then Runbook Memory. Highlight the rejected alternative in the postmortem and the machine-readable verification rule in the runbook.
-
-**Say:**
-
-> Faultline does not end at diagnosis. The proven intervention becomes a scoped recovery plan. The trajectory writes an evidence-backed postmortem that includes the rejected alternative and its limitations. The successful recovery becomes a machine-readable runbook and a regression guard for the next incident.
-
-### 3:50–4:25 — Measured improvement and reproducibility
-
-**Visual:** Show the benchmark table or terminal capture running `pnpm test` followed by `pnpm evaluate:replay`. Keep the full command and final summary visible. Overlay: `12 fixed inputs · <1 sec replay · $0 API cost`.
+**Show:** Open Agent Trajectory, then Recovery. Show the tool calls, allowed actions, safety checks, production isolation, and human approval.
 
 **Say:**
 
-> On the same twelve cases, top-one accuracy improves from 33.3 to 100 percent, recovery validity from 33.3 to 100 percent, and executable causal proof from zero to 100 percent. The credential-free replay runs in under one second at zero API cost. The repository includes exact commands, expected output, raw evaluation artifacts, tests, an improvement changelog, and representative JSONL trajectories.
+> This is agentic because Faultline chooses which evidence to inspect, keeps competing ideas, tests its own leading answer, and learns from a failed test. Every action and result is saved in the trajectory, so nothing is hidden.
+>
+> It also cannot take any random recovery action. Every action must be on the incident’s allowed list. Recovery is tested safely first, and a human still has to approve anything that could affect production.
 
-### 4:25–4:45 — Hot take and close
+### 3:15–3:50 — Show what the user gets
 
-**Visual:** Return to the clean landing close: `Stop narrating incidents. Start proving them.` End on the product URL and GitHub repository for three seconds.
+**Show:** Open Postmortem, then Runbook Memory. Highlight the rejected checkout theory and the saved verification rule.
 
 **Say:**
 
-> My hot take is simple: correlation may propose the cause; only an intervention can prove it. Incident agents should be scored on whether the failure disappears under a controlled change—not on how convincing their postmortem sounds. This is Faultline.
+> Faultline does not stop after finding the cause. It creates a recovery plan, writes a postmortem with the evidence, and records the ideas it rejected. It also turns the successful fix into a reusable runbook and a test for the next incident. Every solved incident makes the system more useful.
 
-## Required visual assets
+### 3:50–4:25 — Show the measured result
 
-1. **Dashboard cold-open capture:** hard case before investigation, with the checkout canary and four-service blast radius visible.
-2. **Baseline card:** 33.3% baseline against the same twelve cases.
-3. **Trajectory sequence:** a clean crop containing hypothesis generation, the failed checkout rollback, and successful network reroute.
-4. **Before/after proof card:** `19.0% → 19.0%` rejected beside `19.0% → 0.8%` causal.
-5. **Safety gates:** action allowlist, fresh snapshot, zero production connection, and human approval.
-6. **Operational artifacts:** postmortem plus runbook memory in one split-screen or two fast cuts.
-7. **Terminal proof:** tests passing and the replay evaluation summary.
-8. **Final slate:** product URL, GitHub URL, one-command reproduction, and the one-line hot take.
+**Show:** Display the benchmark or a terminal recording of `pnpm test` and `pnpm evaluate:replay`. Add this caption: `12 fixed cases · under 1 second · $0 API cost`.
 
-## Visual direction
+**Say:**
 
-- Use the existing warm off-white and restrained violet system. Avoid neon glow overload, fake telemetry, or decorative 3D objects.
-- Use direct screen capture for claims. Never replace evidence with a marketing animation.
-- Reserve purple for the active hypothesis or causal proof; red for rejected/failed; green only for verified gates.
-- Use one overlay style throughout: 12–16 px monospace, off-white on a 75% black rounded rectangle.
-- Prefer hard cuts between proof stages. Use one 200–300 ms crossfade only when moving from landing page to dashboard.
-- Keep each key result on screen for at least two seconds. Judges must be able to read the evidence without pausing.
-- Do not scroll while speaking a critical number. Arrive at the number, stop, then deliver the line.
-- Record a clean backup take of the full hard-case flow. Also export individual clips for baseline, trajectory, recovery, and benchmark so a failed take does not force a complete rerecord.
+> I tested the baseline and Faultline on the same twelve fixed incidents. Root-cause accuracy improves from 33.3 percent to 100 percent. Valid recovery actions also improve from 33.3 percent to 100 percent. The baseline proves no causes. Faultline produces causal proof on all twelve test cases. These are reproducible synthetic results, not a claim about every real production incident.
 
-## Submission package checklist
+### 4:25–4:45 — Close
 
-- Public repository with complete code and no credentials.
-- README naming the user, bottleneck, value, baseline, advanced workflow, main failure mode, and hot take.
-- Improvement changelog connecting meaningful iterations to evidence.
-- Reproduction guide with exact versions, commands, expected output, runtime, and API cost.
-- Raw replay summary and representative agent trajectories.
-- Pre-existing work disclosure.
-- Five-minute-or-shorter solution video following the script above.
-- Working public product link with no authentication gate.
+**Show:** Return to the final landing-page section: `Stop narrating incidents. Start proving them.` End with the live product and GitHub links.
 
-## What not to do in the demo
+**Say:**
+
+> My point is simple: correlation can suggest a cause, but a controlled test is what proves it. Incident agents should not win because their explanation sounds confident. They should win because the failure disappears when they change the right thing. That is Faultline.
+
+## Visuals to prepare
+
+1. The hard case before the investigation starts.
+2. The Live Pulse page with three real sources and recent capture times.
+3. The baseline result showing 33.3% accuracy.
+4. The failed checkout test: `19.0% → 19.0%`.
+5. The successful network test: `19.0% → 0.8%`.
+6. The agent trajectory and its saved tool results.
+7. The recovery safety checks and human approval state.
+8. The postmortem and reusable runbook.
+9. The passing tests and benchmark summary.
+10. A final screen with the product URL and GitHub URL.
+
+## Recording direction
+
+- Use the existing off-white, black, and purple design.
+- Use real screen recordings for important claims.
+- Keep captions short and use the same caption style throughout.
+- Use purple for the active idea, red for a failed test, and green for proof that passed.
+- Stop scrolling before you say an important number.
+- Leave every key result on screen for at least two seconds.
+- Use simple cuts. Avoid distracting transitions.
+- Record the hard-case flow twice so you have a backup take.
+
+## Submission checklist
+
+- Public GitHub repository with no private keys.
+- Public product link with no sign-in gate.
+- README explaining the user, problem, baseline, full workflow, results, and limitations.
+- Improvement changelog linked to evidence.
+- Exact setup and reproduction commands.
+- Raw benchmark output and sample agent trajectories.
+- Clear disclosure of any work that existed before the hackathon.
+- Demo video under five minutes.
+
+## Avoid these mistakes
 
 - Do not spend the first minute touring the landing page.
-- Do not call 100% replay accuracy a production benchmark.
-- Do not imply that Faultline executes production recovery autonomously.
-- Do not hide the failed checkout experiment; it is the strongest evidence of technical judgment.
-- Do not list every feature. Demonstrate one hard case end to end, then show how the result becomes reusable memory.
+- Do not say the 100% synthetic result guarantees production accuracy.
+- Do not say Faultline changes production by itself.
+- Do not hide the failed checkout test. It is one of the strongest parts of the demo.
+- Do not call the public status feeds private production telemetry.
