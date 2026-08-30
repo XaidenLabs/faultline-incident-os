@@ -57,7 +57,7 @@ export type IngestionRun = {
 
 async function publicFetch<T>(path: string) {
   const response = await fetch(`${faultlineSupabaseUrl}/rest/v1/${path}`, {
-    headers: { apikey: faultlineSupabaseKey, Authorization: `Bearer ${faultlineSupabaseKey}` },
+    headers: { apikey: faultlineSupabaseKey },
     cache: "no-store",
   });
   if (!response.ok) throw new Error(`Live memory query failed (${response.status})`);
