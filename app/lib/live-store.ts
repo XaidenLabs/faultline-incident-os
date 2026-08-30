@@ -72,7 +72,10 @@ export async function getLiveSignalMemory() {
     publicFetch<IngestionRun[]>("faultline_ingestion_runs?select=*&order=started_at.desc,id.desc&limit=12"),
   ]);
 
-  const latestBySource = Array.from(new Map(snapshots.map((snapshot) => [snapshot.source, snapshot])).values());
+  const latestBySource = Array.from(snapshots.reduce((latest, snapshot) => {
+    if (!latest.has(snapshot.source)) latest.set(snapshot.source, snapshot);
+    return latest;
+  }, new Map<LiveSnapshot["source"], LiveSnapshot>()).values());
   const seenFingerprints = new Set<string>();
   const changeStream = observations.filter((observation) => {
     if (seenFingerprints.has(observation.fingerprint)) return false;
