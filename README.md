@@ -2,7 +2,7 @@
 
 > Don’t guess the root cause. Prove it.
 
-Faultline is a counterfactual incident laboratory for on-call engineers. It reconstructs candidate causal chains from telemetry, then changes one suspected cause at a time in an isolated incident snapshot and replays the failure. A diagnosis is promoted only when that single intervention clears the symptom without creating another regression.
+Faultline is a live incident observer and counterfactual proof laboratory for on-call engineers. Live Pulse captures real public GitHub, Cloudflare, and npm service-status signals every two minutes and retains what the agent saw in append-only Supabase memory. Proof Lab reconstructs candidate causal chains from versioned synthetic telemetry, then changes one suspected cause at a time in an isolated snapshot and replays the failure. A diagnosis is promoted only when that single intervention clears the symptom without creating another regression.
 
 The laboratory is the proof engine inside a larger incident-response operating system:
 
@@ -11,6 +11,7 @@ Observe → Investigate → Prove → Rehearse → Approve → Learn
 ```
 
 - **Incident intake** normalizes fragmented telemetry into one bounded fault surface and blast radius.
+- **Live Pulse** ingests public operational signals on a schedule, normalizes changes, and streams newly persisted evidence into the dashboard.
 - **Counterfactual investigation** competes hypotheses and runs one-variable experiments.
 - **Recovery Lab** turns the proven intervention into a scoped plan with risk and rollback gates.
 - **Health-gated rehearsal** measures the recovery against the original symptom, service health, regressions, and production isolation.
@@ -43,6 +44,14 @@ The advanced workflow does more than summarize supplied telemetry:
 9. **Trajectory capture:** preserve every query, experiment, rejected explanation, and decision.
 
 Purposeful choices matter more than agent count. Faultline uses one investigator role and a skeptical verification stage; the verifier exists because unsupported inference is the failure mode being addressed.
+
+## Live data versus proof data
+
+The dashboard opens in **Live Pulse**. A Supabase Edge Function fetches the official GitHub Status, Cloudflare Status, and npm Status APIs every two minutes. Each run, normalized snapshot, changed observation, and triage summary is timestamped and retained. Supabase Realtime pushes new snapshot and insight rows to connected dashboards, with a 30-second polling fallback.
+
+Live Pulse is deliberately observational: it does not claim private telemetry, a hidden root cause, or authority to change third-party production systems. **Proof Lab** remains separate because its interventions can be executed safely, replayed from a clean environment, and scored against known labels. This separation makes the product dynamic without weakening the benchmark's reproducibility.
+
+Model enrichment is optional. When `OPENAI_API_KEY` is configured as a Supabase Edge Function secret, the live observer uses the Responses API to produce an evidence-bounded triage summary. Without the key—or when the model is unavailable—collection continues and the deterministic summary is stored instead.
 
 ## Baseline
 
@@ -107,6 +116,8 @@ The default live model is `gpt-5.6-luna`; override it with `OPENAI_MODEL`. Both 
 
 ```text
 app/                         Interactive incident room
+app/dashboard/LivePulse.tsx  Realtime live-operations surface
+app/api/live-signals/        Read-only live memory API
 core/scenarios.mjs           Versioned synthetic incident bundles
 core/replay-agent.mjs        Credential-free baseline and advanced replay
 core/sandbox.mjs             Isolated counterfactual experiment engine
@@ -119,12 +130,15 @@ artifacts/evaluation/        Raw evaluation output
 artifacts/trajectories/      Representative JSONL trajectories
 artifacts/incident-packages/ Recovery, postmortem and runbook artifacts
 docs/                        Architecture and evaluation detail
+supabase/migrations/         Live-memory schema and two-minute scheduler
+supabase/functions/          Public-status ingestion Edge Function
 tests/                       Safety, trajectory, data and UI contracts
 ```
 
 ## Safety and data
 
 - All bundled incidents and telemetry are synthetic.
+- Live Pulse uses only public status APIs and is clearly separated from the synthetic proof cases.
 - Every experiment starts from a fresh synthetic snapshot and cannot perform external actions.
 - Live mode exposes only incident-scoped read tools.
 - Recovery is selected from an explicit allowlist.
@@ -146,6 +160,7 @@ Main observed failure in the prior iteration: a recent change dominated the scor
 - [Evaluation contract](docs/EVALUATION.md)
 - [Agent trajectory guide](docs/AGENT_TRAJECTORIES.md)
 - [Five-minute demo pitch and visual direction](docs/DEMO_PITCH.md)
+- [Live data architecture and operations](docs/LIVE_DATA.md)
 - [Pre-existing work disclosure](docs/PREEXISTING_WORK.md)
 
 ## Research grounding

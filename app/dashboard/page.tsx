@@ -4,8 +4,10 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { gsap } from "gsap";
+import { LivePulse } from "./LivePulse";
 
 type View = "proof" | "recovery" | "postmortem" | "runbook";
+type Mode = "live" | "proof-lab";
 type RunState = "loading" | "idle" | "running" | "replaying" | "proved" | "error";
 type InvestigationEnvelope = { status: "queued" | "running" | "completed"; persistence: "local" | "supabase"; runId?: string; attempt?: number; result?: InvestigationResult };
 
@@ -53,6 +55,7 @@ type InvestigationResult = {
 export default function DashboardPage() {
   const rootRef = useRef<HTMLElement>(null);
   const [incidents, setIncidents] = useState<Incident[]>([]);
+  const [mode, setMode] = useState<Mode>("live");
   const [selectedId, setSelectedId] = useState("");
   const [result, setResult] = useState<InvestigationResult | null>(null);
   const [runState, setRunState] = useState<RunState>("loading");
@@ -127,7 +130,7 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => {
-    if (!selectedId) return;
+    if (!selectedId || mode !== "proof-lab") return;
     const controller = new AbortController();
     const timer = window.setTimeout(() => {
       void investigateIncident(selectedId, false, controller.signal).catch((error) => {
@@ -136,7 +139,7 @@ export default function DashboardPage() {
       });
     }, 0);
     return () => { window.clearTimeout(timer); controller.abort(); };
-  }, [investigateIncident, selectedId]);
+  }, [investigateIncident, mode, selectedId]);
 
   useEffect(() => {
     const context = gsap.context(() => gsap.from(".m-enter", { opacity: 0, y: 12, duration: .55, stagger: .04, ease: "power3.out" }), rootRef);
@@ -180,6 +183,7 @@ export default function DashboardPage() {
   }
 
   function chooseIncident(id: string) {
+    setMode("proof-lab");
     setSelectedId(id);
     setResult(null);
     setVisibleEvents(0);
@@ -198,26 +202,29 @@ export default function DashboardPage() {
         <div className="minimal-brand"><Link href="/">✦ <span>Faultline</span></Link><button onClick={() => setNavOpen(false)} aria-label="Close menu">×</button></div>
         <nav className="minimal-nav">
           <small>WORKSPACE</small>
-          <button className={view === "proof" ? "active" : ""} onClick={() => { setView("proof"); setNavOpen(false); }}>◉ <span>Investigation</span></button>
-          <button className={view === "recovery" ? "active" : ""} onClick={() => { setView("recovery"); setNavOpen(false); }}>↺ <span>Recovery</span></button>
-          <button className={view === "postmortem" ? "active" : ""} onClick={() => { setView("postmortem"); setNavOpen(false); }}>▤ <span>Postmortem</span></button>
-          <button className={view === "runbook" ? "active" : ""} onClick={() => { setView("runbook"); setNavOpen(false); }}>◇ <span>Runbook</span></button>
+          <button className={mode === "live" ? "active" : ""} onClick={() => { setMode("live"); setNavOpen(false); }}>◉ <span>Live pulse</span></button>
+          <button className={mode === "proof-lab" && view === "proof" ? "active" : ""} onClick={() => { setMode("proof-lab"); setView("proof"); setNavOpen(false); }}>⌁ <span>Proof lab</span></button>
+          <small>PROOF ARTIFACTS</small>
+          <button className={mode === "proof-lab" && view === "recovery" ? "active" : ""} onClick={() => { setMode("proof-lab"); setView("recovery"); setNavOpen(false); }}>↺ <span>Recovery</span></button>
+          <button className={mode === "proof-lab" && view === "postmortem" ? "active" : ""} onClick={() => { setMode("proof-lab"); setView("postmortem"); setNavOpen(false); }}>▤ <span>Postmortem</span></button>
+          <button className={mode === "proof-lab" && view === "runbook" ? "active" : ""} onClick={() => { setMode("proof-lab"); setView("runbook"); setNavOpen(false); }}>◇ <span>Runbook</span></button>
         </nav>
-        <div className="minimal-incidents"><small>INCIDENTS · {incidents.length}</small>{incidents.map((incident) => <button key={incident.id} className={incident.id === selectedId ? "active" : ""} onClick={() => chooseIncident(incident.id)}><span className={`severity severity-${incident.severity.at(-1)}`} /><div><strong>{incident.id}</strong><small>{incident.title}</small></div></button>)}</div>
-        <div className="isolation-note"><span>✓</span><div><strong>Simulation only</strong><small>No production connection</small></div></div>
+        {mode === "proof-lab" && <div className="minimal-incidents"><small>PROOF CASES · {incidents.length}</small>{incidents.map((incident) => <button key={incident.id} className={incident.id === selectedId ? "active" : ""} onClick={() => chooseIncident(incident.id)}><span className={`severity severity-${incident.severity.at(-1)}`} /><div><strong>{incident.id}</strong><small>{incident.title}</small></div></button>)}</div>}
+        <div className="isolation-note"><span>✓</span><div><strong>{mode === "live" ? "Read-only observer" : "Safe proof lab"}</strong><small>{mode === "live" ? "Public signals · no external actions" : "Synthetic snapshots only"}</small></div></div>
       </aside>
 
       <section className="minimal-main">
         <header className="minimal-topbar">
-          <div><button className="drawer-toggle nav-toggle" onClick={() => setNavOpen(true)} aria-label="Open incident navigation">☰</button><span className="status-orb" /><strong>Faultline</strong>{selected && <small>/ {selected.id}</small>}</div>
+          <div><button className="drawer-toggle nav-toggle" onClick={() => setNavOpen(true)} aria-label="Open incident navigation">☰</button><span className="status-orb" /><strong>Faultline</strong><small>/ {mode === "live" ? "LIVE" : selected?.id ?? "PROOF LAB"}</small></div>
           <div><button className="drawer-toggle" onClick={() => setCopilotOpen(true)} aria-label="Open proof copilot">✦</button><span className="dash-avatar">AD</span></div>
         </header>
 
         <div className="minimal-content">
+          {mode === "live" ? <LivePulse /> : <>
           {runState === "loading" && <DashboardState title="Loading incidents" copy="Reading the versioned incident dataset…" />}
           {runState === "error" && <DashboardState title="The agent lost its connection" copy="Retry to resume this incident from its persisted queue state." action="Retry" onAction={() => selected ? void investigateIncident(selected.id).catch(() => setRunState("error")) : void loadIncidents()} />}
           {selected && runState !== "loading" && runState !== "error" && <>
-            <header className="minimal-title m-enter"><div><span className="minimal-chip">{selected.severity} · AUTONOMOUS REPLAY</span><h1>{selected.title}</h1><p>{selected.symptom}</p></div><div className="agent-control"><div className="agent-live"><span /><div><strong>{runState === "running" ? "Agent investigating" : runState === "replaying" ? "Compiling proof" : complete ? "Agent complete" : "Agent standing by"}</strong><small>{persistence === "supabase" ? "Persistent queue · Supabase" : persistence === "degraded" ? "Persistence degraded" : "Ephemeral local run"}</small></div></div><button className="minimal-rerun" onClick={() => void rerunInvestigation()} disabled={runState === "running" || runState === "replaying"}>Re-run</button></div></header>
+            <header className="minimal-title m-enter"><div><span className="minimal-chip">{selected.severity} · SYNTHETIC PROOF LAB</span><h1>{selected.title}</h1><p>{selected.symptom}</p></div><div className="agent-control"><div className="agent-live"><span /><div><strong>{runState === "running" ? "Agent investigating" : runState === "replaying" ? "Compiling proof" : complete ? "Agent complete" : "Agent standing by"}</strong><small>{persistence === "supabase" ? "Persistent queue · Supabase" : persistence === "degraded" ? "Persistence degraded" : "Ephemeral local run"}</small></div></div><button className="minimal-rerun" onClick={() => void rerunInvestigation()} disabled={runState === "running" || runState === "replaying"}>Re-run</button></div></header>
 
             <section className="minimal-metrics m-enter">
               <article><small>PEAK SIGNAL</small><strong>{selected.peakErrorRate}%</strong><span>visible error rate</span></article>
@@ -232,13 +239,14 @@ export default function DashboardPage() {
             {view === "proof" && <ProofView incident={selected} result={result} shownEvents={shownEvents} complete={Boolean(complete)} runState={runState} />}
             {view !== "proof" && <ArtifactView view={view} result={result} />}
           </>}
+          </>}
         </div>
       </section>
 
       <aside className={`minimal-copilot ${copilotOpen ? "drawer-open" : ""}`}>
-        <header><div><span className="copilot-orb">✦</span><div><strong>Proof copilot</strong><small>{selected?.id ?? "No incident selected"}</small></div></div><button onClick={() => setCopilotOpen(false)} aria-label="Close copilot">×</button></header>
-        <section className="copilot-summary"><small>STATUS</small><strong>{complete ? "Cause proven" : result ? "Proof in progress" : runState === "running" ? "Agent investigating" : "Agent standing by"}</strong><p>{result?.postmortem.proof ?? selected?.symptom ?? "Select an incident to begin."}</p></section>
-        {result && <>
+        <header><div><span className="copilot-orb">✦</span><div><strong>{mode === "live" ? "Live observer" : "Proof copilot"}</strong><small>{mode === "live" ? "REALTIME MEMORY" : selected?.id ?? "No incident selected"}</small></div></div><button onClick={() => setCopilotOpen(false)} aria-label="Close copilot">×</button></header>
+        <section className="copilot-summary"><small>STATUS</small><strong>{mode === "live" ? "Watching public signals" : complete ? "Cause proven" : result ? "Proof in progress" : runState === "running" ? "Agent investigating" : "Agent standing by"}</strong><p>{mode === "live" ? "New GitHub, Cloudflare, and npm captures are written to Supabase every two minutes. Open Live Pulse to inspect the retained evidence." : result?.postmortem.proof ?? selected?.symptom ?? "Select an incident to begin."}</p></section>
+        {mode === "proof-lab" && result && <>
           <section className="copilot-facts"><div><small>ROOT SERVICE</small><strong>{result.investigation.rootService}</strong></div><div><small>CONFIDENCE</small><strong>{result.investigation.confidence}%</strong></div></section>
           <section className="copilot-action"><small>PROPOSED RECOVERY</small><strong>{result.recovery.action ?? "Blocked"}</strong><span>{result.recovery.approval.status}</span></section>
         </>}

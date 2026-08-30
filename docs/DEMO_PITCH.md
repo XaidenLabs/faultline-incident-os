@@ -8,7 +8,7 @@ Faultline is an agentic incident-response system that does not stop at a plausib
 
 Target runtime: **4:40–4:55**. Record at 1440×900 or 1920×1080, 16:9, with the browser at 100% zoom. Keep the cursor still unless it is performing the next deliberate action.
 
-### 0:00–0:25 — Cold open: the failure of plausible answers
+### 0:00–0:20 — Cold open: the failure of plausible answers
 
 **Visual:** Open directly on the hard-case incident in the dashboard. Keep the checkout canary marker and regional error signal visible. Add a small overlay: `A recent deploy is not necessarily the cause.`
 
@@ -16,7 +16,7 @@ Target runtime: **4:40–4:55**. Record at 1440×900 or 1920×1080, 16:9, with t
 
 > At 14:07, checkout changes. Seconds later, four services begin failing across eu-south. Every obvious signal points at checkout—but the obvious answer is wrong. Today, incident tools summarize correlation. Faultline tests causality.
 
-### 0:25–0:50 — User, bottleneck, and value
+### 0:20–0:40 — User, bottleneck, and value
 
 **Visual:** Briefly cut to the landing hero, then scroll only far enough to show “From alert to reusable operational memory.”
 
@@ -24,7 +24,15 @@ Target runtime: **4:40–4:55**. Record at 1440×900 or 1920×1080, 16:9, with t
 
 > Faultline is built for the on-call engineer whose evidence is fragmented across metrics, logs, traces, deploys, topology, and runbooks. A confident wrong diagnosis wastes the recovery window. Faultline turns a plausible explanation into executable before-and-after proof—before recovery touches production.
 
-### 0:50–1:20 — Baseline first
+### 0:40–1:05 — Live operational memory
+
+**Visual:** Open Live Pulse. Show the three real source cards, Realtime connection state, current incidents, and capture-history hashes.
+
+**Say:**
+
+> This is not a frozen dashboard. Every two minutes, Faultline captures the official GitHub, Cloudflare, and npm status feeds. Each snapshot and changed observation is timestamped in Supabase and streamed into the interface. Live Pulse reports only what the public evidence says and preserves exactly what the agent saw.
+
+### 1:05–1:25 — Baseline first
 
 **Visual:** Show the baseline comparison. Highlight `33.3% top-1 accuracy`, then the baseline rule: it selects the loudest visible error. Keep the numbers large and readable.
 
@@ -32,7 +40,7 @@ Target runtime: **4:40–4:55**. Record at 1440×900 or 1920×1080, 16:9, with t
 
 > I built a fair baseline on the same twelve versioned synthetic incidents. It inspects the supplied summary once and chooses the loudest failing component. That is a reasonable first response—and it reaches only 33.3 percent top-one root-cause accuracy. It has no selective tools, hypothesis competition, action validation, or intervention.
 
-### 1:20–2:40 — Full realistic agent execution
+### 1:25–2:35 — Full realistic agent execution
 
 **Visual:** Return to the hard case. Start or replay the investigation. Let trajectory events populate. Pause briefly on each of these moments: fault-surface inventory, competing hypotheses, contradiction check, `CF-01 rejected`, and `CF-02 causal`.
 
@@ -42,7 +50,7 @@ Target runtime: **4:40–4:55**. Record at 1440×900 or 1920×1080, 16:9, with t
 >
 > Rolling checkout back changes nothing: packet loss remains at nineteen percent. That failed experiment is not hidden; it becomes evidence, and the checkout hypothesis is rejected. The agent then tests the shared network path. Rerouting the affected zone drops the failure to 0.8 percent across all four services with no unrelated regression. That is the causal proof.
 
-### 2:40–3:25 — Engineering and safety
+### 2:35–3:15 — Engineering and safety
 
 **Visual:** Open Agent Trajectory and show the append-only event sequence and tool arguments. Then open Recovery Lab and show the action catalog, four rehearsal gates, production isolation, and human approval state.
 
@@ -52,7 +60,7 @@ Target runtime: **4:40–4:55**. Record at 1440×900 or 1920×1080, 16:9, with t
 >
 > Consequential recovery is never autonomous. Proposed actions must exist in the incident’s allowlist, are rehearsed against symptom clearance, restored health, secondary regressions, and production isolation, and remain held for a qualified human approval.
 
-### 3:25–4:05 — End-to-end outcome
+### 3:15–3:50 — End-to-end outcome
 
 **Visual:** Show Postmortem, then Runbook Memory. Highlight the rejected alternative in the postmortem and the machine-readable verification rule in the runbook.
 
@@ -60,7 +68,7 @@ Target runtime: **4:40–4:55**. Record at 1440×900 or 1920×1080, 16:9, with t
 
 > Faultline does not end at diagnosis. The proven intervention becomes a scoped recovery plan. The trajectory writes an evidence-backed postmortem that includes the rejected alternative and its limitations. The successful recovery becomes a machine-readable runbook and a regression guard for the next incident.
 
-### 4:05–4:35 — Measured improvement and reproducibility
+### 3:50–4:25 — Measured improvement and reproducibility
 
 **Visual:** Show the benchmark table or terminal capture running `pnpm test` followed by `pnpm evaluate:replay`. Keep the full command and final summary visible. Overlay: `12 fixed inputs · <1 sec replay · $0 API cost`.
 
@@ -68,7 +76,7 @@ Target runtime: **4:40–4:55**. Record at 1440×900 or 1920×1080, 16:9, with t
 
 > On the same twelve cases, top-one accuracy improves from 33.3 to 100 percent, recovery validity from 33.3 to 100 percent, and executable causal proof from zero to 100 percent. The credential-free replay runs in under one second at zero API cost. The repository includes exact commands, expected output, raw evaluation artifacts, tests, an improvement changelog, and representative JSONL trajectories.
 
-### 4:35–4:55 — Hot take and close
+### 4:25–4:45 — Hot take and close
 
 **Visual:** Return to the clean landing close: `Stop narrating incidents. Start proving them.` End on the product URL and GitHub repository for three seconds.
 

@@ -52,18 +52,18 @@ export default function LandingPage() {
         <div className="hero-copy">
           <span className="hero-reveal micro-label">FRONTIER AGENTIC INCIDENT ENGINEERING</span>
           <h1 className="hero-reveal">Incidents don’t need another explanation.<br /><em>They need proof.</em></h1>
-          <p className="hero-reveal">Faultline changes one suspected cause inside a synthetic snapshot, replays the failure, and preserves the evidence trail—before a human-approved recovery ever touches production.</p>
+          <p className="hero-reveal">Faultline watches real public operational signals, remembers exactly what it saw, and proves suspected causes inside isolated snapshots—before a human-approved recovery ever touches production.</p>
           <div className="hero-reveal hero-actions"><Link className="pill-button pill-light" href="/dashboard">Run the hard case <span>→</span></Link><a className="text-link" href="#system">See the full system ↓</a></div>
         </div>
         <div className="hero-proof-row">
-          <div className="hero-proof"><span>BASELINE</span><strong>33.3%</strong><small>root-cause accuracy</small></div>
-          <div className="hero-proof"><span>FAULTLINE</span><strong>100%</strong><small>causal proof rate</small></div>
+          <div className="hero-proof"><span>PROOF LAB BASELINE</span><strong>33.3%</strong><small>root-cause accuracy</small></div>
+          <div className="hero-proof"><span>PROOF LAB · FAULTLINE</span><strong>100%</strong><small>causal proof rate</small></div>
         </div>
       </section>
 
       <section id="system" className="intro-section scroll-reveal">
         <div><span className="section-index">01 / INCIDENT OS</span><h2>From alert to reusable operational memory.</h2><Link className="pill-button pill-dark" href="/dashboard">Explore the system</Link></div>
-        <p>Faultline is an end-to-end operating system for high-pressure incident response. It observes the full blast radius, proves the cause with counterfactual experiments, rehearses recovery, preserves human control, and converts every resolution into a regression guard.</p>
+        <p>Faultline is an end-to-end operating system for high-pressure incident response. Live Pulse captures real operational evidence into append-only memory; Proof Lab tests causality, rehearses recovery, preserves human control, and converts every verified resolution into a regression guard.</p>
       </section>
 
       <section className="value-grid scroll-reveal">
@@ -72,7 +72,7 @@ export default function LandingPage() {
         <article className="value-card value-card-purple"><span className="card-number">03</span><h3>Every incident compounds</h3><p>Proof becomes a postmortem. Recovery becomes a runbook. Failure becomes a test.</p><div className="memory-lines"><i /><i /><i /><i /></div></article>
       </section>
 
-      <div className="credibility-strip scroll-reveal"><span>12 SYNTHETIC INCIDENTS</span><span>100% ACTION CONTAINMENT</span><span>APPEND-ONLY TRAJECTORIES</span><span>ZERO PRODUCTION CONNECTIONS</span><span>REPLAY SUITE &lt; 1 SEC</span></div>
+      <div className="credibility-strip scroll-reveal"><span>3 LIVE PUBLIC SOURCES</span><span>12 SYNTHETIC PROOF CASES</span><span>APPEND-ONLY MEMORY</span><span>ZERO PRODUCTION ACTIONS</span><span>REPLAY SUITE &lt; 1 SEC</span></div>
 
       <section className="evaluation-section scroll-reveal" aria-labelledby="evaluation-heading">
         <div className="evaluation-heading"><span className="section-index">02 / VERIFIABLE BY DESIGN</span><h2 id="evaluation-heading">Built to survive a judge’s clean-room test.</h2><p>The product, benchmark, and repository tell the same story. Every claim has a runnable path to evidence.</p></div>
