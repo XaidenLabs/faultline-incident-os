@@ -4,8 +4,10 @@
 
 Live Pulse turns Faultline's database into operational memory rather than a fixture store. It records what the observer actually saw, when it saw it, which source supplied it, and whether the source changed.
 
-- **Live Pulse** observes real public systems but cannot safely intervene in them, so it reports status evidence and changes without claiming causal proof.
-- **Proof Lab** uses versioned synthetic incidents so counterfactual interventions, hidden labels, baselines, and repeatable scoring remain possible.
+- **Live Pulse** watches real public systems. It can save a signal as an investigation case, but it cannot safely change those systems, so it does not claim causal proof.
+- **Counterfactual Lab** uses fixed test incidents so one-variable experiments and repeatable scoring are safe and possible.
+
+The connection between them is the investigation case. A live signal becomes a durable record with provenance. The case says whether a safe test adapter is connected. If no adapter exists, the evidence remains useful but the cause stays unproven.
 
 ## Sources
 
@@ -27,6 +29,18 @@ pg_cron (every 2 minutes)
   → Supabase Realtime notifies connected dashboards
   → 30-second client polling remains as a transport fallback
 ```
+
+When a user clicks **Investigate**:
+
+```text
+saved snapshot or observation
+  → validate the source IDs
+  → create one durable public case
+  → append capture, normalization, and adapter-check events
+  → open a shareable evidence page
+```
+
+The action is idempotent: choosing the same saved signal again returns the same case.
 
 Every scheduled run stores an ingestion-health record with attempted sources, successful sources, timestamps, and bounded error details. One source can fail without discarding successful captures from the others.
 
