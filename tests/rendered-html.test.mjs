@@ -3,13 +3,17 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 test("ships the animated Faultline product and command center instead of starter content", async () => {
-  const [page, dashboard, livePulse, incidentsApi, investigateApi, liveApi, layout, css] = await Promise.all([
+  const [page, dashboard, livePulse, incidentsApi, investigateApi, liveApi, casesApi, casePage, evidencePage, docsPage, layout, css] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/dashboard/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/dashboard/LivePulse.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/api/incidents/route.ts", import.meta.url), "utf8"),
     readFile(new URL("../app/api/investigate/route.ts", import.meta.url), "utf8"),
     readFile(new URL("../app/api/live-signals/route.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/cases/route.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/cases/[id]/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/evidence/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/docs/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
   ]);
@@ -17,7 +21,7 @@ test("ships the animated Faultline product and command center instead of starter
   assert.match(page, /Incidents don’t need another explanation/);
   assert.doesNotMatch(page, /FaultlineScene|three/);
   assert.match(page, /gsap/);
-  assert.match(dashboard, /SYNTHETIC PROOF LAB/);
+  assert.match(dashboard, /FIXED COUNTERFACTUAL CASE/);
   assert.match(dashboard, /Live pulse/);
   assert.match(dashboard, /investigateIncident\(selectedId, false/);
   assert.match(dashboard, />Re-run</);
@@ -33,7 +37,12 @@ test("ships the animated Faultline product and command center instead of starter
   assert.match(investigateApi, /runIncidentOS/);
   assert.match(livePulse, /postgres_changes/);
   assert.match(livePulse, /append-only operational memory/);
+  assert.match(livePulse, /Open case/);
   assert.match(liveApi, /getLiveSignalMemory/);
+  assert.match(casesApi, /promoteLiveSignal/);
+  assert.match(casePage, /Not available yet/);
+  assert.match(evidencePage, /A controlled test, not a production promise/);
+  assert.match(docsPage, /explained for anyone/);
   assert.match(css, /@media \(max-width: 1280px\)/);
   assert.match(css, /drawer-open/);
   assert.match(layout, /Counterfactual incident intelligence/);
