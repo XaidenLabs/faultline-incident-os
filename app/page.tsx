@@ -5,10 +5,10 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 
 const lifecycle = [
-  { step: "01", title: "Observe the whole fault surface", copy: "Normalize metrics, logs, traces, changes, topology and allowed actions into one incident bundle." },
-  { step: "02", title: "Prove the cause", copy: "Compete hypotheses, change one suspected variable in an isolated snapshot, and measure whether the failure disappears." },
-  { step: "03", title: "Rehearse recovery", copy: "Gate the proposed action against symptom clearance, restored health, secondary regressions and production isolation." },
-  { step: "04", title: "Turn resolution into memory", copy: "Generate the postmortem, audit trail and a machine-readable runbook that becomes the next regression guard." },
+  { step: "01", title: "Collect the full picture", copy: "Bring the alerts, logs, traces, recent changes, service map, and allowed actions into one case." },
+  { step: "02", title: "Test the likely causes", copy: "Change one suspected cause in a safe copy of the incident and see whether the failure disappears." },
+  { step: "03", title: "Check the recovery", copy: "Confirm that the original problem clears, health improves, and nothing else breaks." },
+  { step: "04", title: "Save what worked", copy: "Turn the evidence into a postmortem, recovery guide, and test for the next incident." },
 ];
 
 export default function LandingPage() {
@@ -44,26 +44,26 @@ export default function LandingPage() {
     <main ref={rootRef} className="landing-shell">
       <nav className="landing-nav">
         <Link className="wordmark" href="/"><span>✦</span> Faultline</Link>
-        <div className="landing-links"><a href="#system">System</a><a href="#proof">Proof Lab</a><a href="#benchmark">Benchmarks</a><a href="#learn">Runbooks</a></div>
+        <div className="landing-links"><a href="#system">System</a><Link href="/evidence">How it works</Link><Link href="/docs">Simple guide</Link><a href="#benchmark">Results</a></div>
         <Link className="pill-button pill-dark" href="/dashboard">Launch Incident OS <span>↗</span></Link>
       </nav>
 
       <section className="hero-stage">
         <div className="hero-copy">
-          <span className="hero-reveal micro-label">FRONTIER AGENTIC INCIDENT ENGINEERING</span>
+          <span className="hero-reveal micro-label">LIVE INCIDENT EVIDENCE + SAFE CAUSAL TESTS</span>
           <h1 className="hero-reveal">Incidents don’t need another explanation.<br /><em>They need proof.</em></h1>
-          <p className="hero-reveal">Faultline watches real public operational signals, remembers exactly what it saw, and proves suspected causes inside isolated snapshots—before a human-approved recovery ever touches production.</p>
+          <p className="hero-reveal">Faultline watches live public incident signals, saves exactly what it saw, and tests suspected causes inside a safe copy of the failure. Production is never changed automatically.</p>
           <div className="hero-reveal hero-actions"><Link className="pill-button pill-light" href="/dashboard">Run the hard case <span>→</span></Link><a className="text-link" href="#system">See the full system ↓</a></div>
         </div>
         <div className="hero-proof-row">
-          <div className="hero-proof"><span>PROOF LAB BASELINE</span><strong>33.3%</strong><small>root-cause accuracy</small></div>
-          <div className="hero-proof"><span>PROOF LAB · FAULTLINE</span><strong>100%</strong><small>causal proof rate</small></div>
+          <div className="hero-proof"><span>CONTROLLED TEST · BASELINE</span><strong>33.3%</strong><small>correct root cause</small></div>
+          <div className="hero-proof"><span>CONTROLLED TEST · FAULTLINE</span><strong>100%</strong><small>cases with causal proof</small></div>
         </div>
       </section>
 
       <section id="system" className="intro-section scroll-reveal">
         <div><span className="section-index">01 / INCIDENT OS</span><h2>From alert to reusable operational memory.</h2><Link className="pill-button pill-dark" href="/dashboard">Explore the system</Link></div>
-        <p>Faultline is an end-to-end operating system for high-pressure incident response. Live Pulse captures real operational evidence into append-only memory; Proof Lab tests causality, rehearses recovery, preserves human control, and converts every verified resolution into a regression guard.</p>
+        <p>Live Pulse records real public evidence. The Counterfactual Lab uses fixed test incidents to check whether changing a suspected cause actually removes the failure. Successful tests become recovery plans, postmortems, and reusable runbooks.</p>
       </section>
 
       <section className="value-grid scroll-reveal">
@@ -75,24 +75,24 @@ export default function LandingPage() {
       <div className="credibility-strip scroll-reveal"><span>3 LIVE PUBLIC SOURCES</span><span>12 SYNTHETIC PROOF CASES</span><span>APPEND-ONLY MEMORY</span><span>ZERO PRODUCTION ACTIONS</span><span>REPLAY SUITE &lt; 1 SEC</span></div>
 
       <section className="evaluation-section scroll-reveal" aria-labelledby="evaluation-heading">
-        <div className="evaluation-heading"><span className="section-index">02 / VERIFIABLE BY DESIGN</span><h2 id="evaluation-heading">Built to survive a judge’s clean-room test.</h2><p>The product, benchmark, and repository tell the same story. Every claim has a runnable path to evidence.</p></div>
+        <div className="evaluation-heading"><span className="section-index">02 / CHECK THE CLAIMS</span><h2 id="evaluation-heading">Do not take our word for it.</h2><p>The product, test cases, and repository show where every number came from and how to reproduce it.</p></div>
         <div className="evaluation-grid">
-          <article><span>01</span><small>AGENT SOLUTION &amp; ENGINEERING</small><h3>Purposeful tool use</h3><p>Competing hypotheses, contradiction checks, isolated interventions, and a skeptical verifier—not a decorated chatbot.</p></article>
-          <article><span>02</span><small>REPRODUCIBILITY</small><h3>One-command replay</h3><p>Versioned synthetic inputs, exact commands, expected outputs, tests, and inspectable JSONL trajectories.</p></article>
-          <article><span>03</span><small>MEASURED IMPROVEMENT</small><h3>Same cases. Fair baseline.</h3><p>Top-1 accuracy moves from 33.3% to 100%; every iteration is connected to evidence in the changelog.</p></article>
-          <article><span>04</span><small>END-TO-END QUALITY</small><h3>Useful after diagnosis</h3><p>Proof flows into rehearsal, human approval, postmortem evidence, and a reusable regression runbook.</p></article>
+          <article><span>01</span><small>HOW IT REASONS</small><h3>It challenges its first answer</h3><p>Faultline keeps more than one possible cause and actively looks for evidence that could prove its leading idea wrong.</p></article>
+          <article><span>02</span><small>HOW TO REPEAT IT</small><h3>One-command replay</h3><p>The same fixed inputs, commands, expected results, tests, and readable event trails are included.</p></article>
+          <article><span>03</span><small>WHAT IMPROVED</small><h3>Same cases. Fair comparison.</h3><p>Correct root-cause identification moves from 33.3% to 100% on the twelve controlled test incidents.</p></article>
+          <article><span>04</span><small>WHAT THE USER GETS</small><h3>Useful after diagnosis</h3><p>The proven cause becomes a checked recovery plan, a postmortem, and a reusable runbook.</p></article>
         </div>
       </section>
 
       <section id="proof" className="lifecycle-section">
-        <div className="lifecycle-intro scroll-reveal"><span className="section-index">03 / THE WORKFLOW</span><h2>One agentic loop.<br />Four operational outcomes.</h2><p>Not a collection of AI features. One coherent system whose stages verify one another.</p></div>
+        <div className="lifecycle-intro scroll-reveal"><span className="section-index">03 / THE WORKFLOW</span><h2>From live signal<br />to checked recovery.</h2><p>Each step produces evidence that the next step can inspect.</p></div>
         <div className="lifecycle-stack">
           {lifecycle.map((item) => <article className="lifecycle-card scroll-reveal" key={item.step}><span>{item.step}</span><div><small>FAULTLINE STAGE</small><h3>{item.title}</h3><p>{item.copy}</p></div><b>↗</b></article>)}
         </div>
       </section>
 
       <section id="benchmark" className="hard-case-section scroll-reveal">
-        <div className="hard-case-copy"><span className="section-index">04 / THE HARD CASE</span><h2>The obvious answer is wrong.<br />Faultline proves why.</h2><p>A checkout canary begins just before regional packet loss. A normal assistant blames the deploy. Faultline tests it—and learns from being wrong.</p><Link className="pill-button pill-light" href="/dashboard">Watch the investigation</Link></div>
+        <div className="hard-case-copy"><span className="section-index">04 / THE HARD CASE</span><h2>The obvious answer is wrong.<br />Faultline proves why.</h2><p>Checkout has the loudest error and its canary began 80 seconds before the alert. Faultline tests checkout first, sees that the failure remains, and then proves the shared network path.</p><Link className="pill-button pill-light" href="/dashboard?mode=proof-lab">Watch the investigation</Link></div>
         <div className="experiment-board">
           <div className="experiment-head"><span>INC-2492 / EU-SOUTH</span><b>COUNTERFACTUAL LOG</b></div>
           <article><span>CF-01</span><div><small>CHECKOUT ROLLBACK</small><strong>19% → 19%</strong><p>Packet loss survives. Hypothesis rejected.</p></div><b className="reject">REJECTED</b></article>

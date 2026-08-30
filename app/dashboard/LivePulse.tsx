@@ -1,6 +1,8 @@
 "use client";
 
 import { createClient, type RealtimeChannel } from "@supabase/supabase-js";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { IngestionRun, LiveInsight, LiveObservation, LiveSnapshot } from "../lib/live-store";
 
@@ -17,8 +19,11 @@ type LivePayload = {
 const sourceNames = { github: "GitHub", cloudflare: "Cloudflare", npm: "npm" };
 
 export function LivePulse() {
+  const router = useRouter();
   const [payload, setPayload] = useState<LivePayload | null>(null);
   const [connection, setConnection] = useState<"connecting" | "live" | "polling" | "error">("connecting");
+  const [creatingCase, setCreatingCase] = useState<string | null>(null);
+  const [caseError, setCaseError] = useState("");
 
   const refresh = useCallback(async () => {
     const response = await fetch("/api/live-signals", { cache: "no-store" });
@@ -54,33 +59,54 @@ export function LivePulse() {
   const degradedComponents = useMemo(() => payload?.observations.filter((observation) => observation.kind === "component") ?? [], [payload]);
   const newestCapture = payload?.sources.reduce<string | null>((latest, source) => !latest || source.captured_at > latest ? source.captured_at : latest, null);
 
+  const openInvestigation = useCallback(async (snapshotId: number, observationId?: number) => {
+    const requestKey = observationId ? `observation-${observationId}` : `snapshot-${snapshotId}`;
+    setCreatingCase(requestKey);
+    setCaseError("");
+    try {
+      const response = await fetch("/api/cases", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ snapshotId, observationId }),
+      });
+      const result = await response.json() as { case?: { id: string }; error?: string };
+      if (!response.ok || !result.case) throw new Error(result.error ?? "Unable to create the case");
+      router.push(`/cases/${result.case.id}`);
+    } catch (error) {
+      setCaseError(error instanceof Error ? error.message : "Unable to create the case");
+      setCreatingCase(null);
+    }
+  }, [router]);
+
   if (!payload && connection === "error") return <LiveState title="Live memory unavailable" copy="The observer will retry automatically while preserving previous captures in Supabase." />;
   if (!payload) return <LiveState title="Connecting to live signal memory" copy="Opening the latest captured GitHub, Cloudflare, and npm observations…" />;
 
   return <div className="live-pulse">
     <header className="live-pulse-title m-enter">
       <div><span className="minimal-chip live-chip">LIVE PULSE · PUBLIC STATUS DATA</span><h1>What the agent sees now.</h1><p>Real status signals are captured every two minutes and retained as append-only operational memory.</p></div>
-      <div className={`live-connection live-${connection}`}><span /><div><strong>{connection === "live" ? "Realtime connected" : connection === "polling" ? "Polling fallback" : "Connecting"}</strong><small>{newestCapture ? `Latest capture ${relativeTime(newestCapture)}` : "Awaiting first capture"}</small></div></div>
+      <div className="live-title-actions"><Link href="/evidence">How the evidence works</Link><div className={`live-connection live-${connection}`}><span /><div><strong>{connection === "live" ? "Realtime connected" : connection === "polling" ? "Polling fallback" : "Connecting"}</strong><small>{newestCapture ? `Latest capture ${relativeTime(newestCapture)}` : "Awaiting first capture"}</small></div></div></div>
     </header>
 
+    {caseError && <div className="case-error" role="alert"><span>Case creation failed</span><p>{caseError}</p><button onClick={() => setCaseError("")}>Dismiss</button></div>}
+
     <section className="live-source-grid m-enter">
-      {payload.sources.map((source) => <a href={source.source_url} target="_blank" rel="noreferrer" key={source.id} className={`live-source-card live-indicator-${source.indicator}`}>
+      {payload.sources.map((source) => <article key={source.id} className={`live-source-card live-indicator-${source.indicator}`}>
         <header><span>{sourceNames[source.source]}</span><b>{source.indicator}</b></header>
         <h2>{source.description}</h2>
         <div><span><strong>{source.active_incident_count}</strong><small>active incidents</small></span><span><strong>{source.degraded_component_count}</strong><small>degraded components</small></span><span><strong>{source.component_count}</strong><small>observed components</small></span></div>
-        <footer><span>Captured {relativeTime(source.captured_at)}</span><span>↗</span></footer>
-      </a>)}
+        <footer><a href={source.source_url} target="_blank" rel="noreferrer">Source ↗</a><span>Captured {relativeTime(source.captured_at)}</span><button onClick={() => void openInvestigation(source.id)} disabled={creatingCase !== null}>{creatingCase === `snapshot-${source.id}` ? "Creating…" : "Investigate"}</button></footer>
+      </article>)}
     </section>
 
     <section className="live-memory-grid m-enter">
       <div className="live-stream">
         <header><div><small>OBSERVATION STREAM</small><strong>Persisted evidence</strong></div><span>{payload.observations.length} current signals</span></header>
         <div className="live-stream-list">
-          {[...activeIncidents, ...degradedComponents].slice(0, 18).map((observation) => <a href={observation.source_url} target="_blank" rel="noreferrer" key={observation.id}>
+          {[...activeIncidents, ...degradedComponents].slice(0, 18).map((observation) => <article key={observation.id}>
             <span className={`live-severity live-severity-${observation.severity}`} />
-            <div><strong>{observation.title}</strong><small>{sourceNames[observation.source]} · {humanize(observation.status)} · {relativeTime(observation.captured_at)}</small></div>
-            <b>{observation.kind}</b>
-          </a>)}
+            <div><a href={observation.source_url} target="_blank" rel="noreferrer"><strong>{observation.title}</strong></a><small>{sourceNames[observation.source]} · {humanize(observation.status)} · {relativeTime(observation.captured_at)}</small></div>
+            <button onClick={() => void openInvestigation(observation.snapshot_id, observation.id)} disabled={creatingCase !== null}>{creatingCase === `observation-${observation.id}` ? "Creating…" : "Open case"}</button>
+          </article>)}
           {!activeIncidents.length && !degradedComponents.length && <div className="live-clear"><span>✓</span><strong>No degraded components in the latest capture</strong><small>The operational state is still recorded, hashed, and replayable.</small></div>}
         </div>
       </div>

@@ -1,55 +1,57 @@
 # Faultline
 
-> Don’t guess the root cause. Prove it.
+> Do not stop at the most likely explanation. Test it.
 
-Faultline is a live incident observer and counterfactual proof laboratory for on-call engineers. Live Pulse captures real public GitHub, Cloudflare, and npm service-status signals every two minutes and retains what the agent saw in append-only Supabase memory. Proof Lab reconstructs candidate causal chains from versioned synthetic telemetry, then changes one suspected cause at a time in an isolated snapshot and replays the failure. A diagnosis is promoted only when that single intervention clears the symptom without creating another regression.
+Faultline helps teams investigate broken digital services. It watches real public status signals, saves what it saw, and turns a signal into a case that can be inspected later. When a safe test environment is available, Faultline changes one suspected cause at a time and measures what happens. It only calls something the cause when the original failure clears and no new failure appears.
 
-The laboratory is the proof engine inside a larger incident-response operating system:
+The product follows one clear path:
 
 ```text
 Observe → Investigate → Prove → Rehearse → Approve → Learn
 ```
 
-- **Incident intake** normalizes fragmented telemetry into one bounded fault surface and blast radius.
-- **Live Pulse** ingests public operational signals on a schedule, normalizes changes, and streams newly persisted evidence into the dashboard.
-- **Counterfactual investigation** competes hypotheses and runs one-variable experiments.
-- **Recovery Lab** turns the proven intervention into a scoped plan with risk and rollback gates.
-- **Health-gated rehearsal** measures the recovery against the original symptom, service health, regressions, and production isolation.
-- **Evidence-backed postmortem** writes the causal proof and rejected alternatives from the trajectory rather than inventing a retrospective story.
-- **Runbook Memory** compiles every successful recovery into a machine-readable regression guard for the next incident.
-- **Evaluation Lab** compares the simple baseline, advanced workflow, proof rate, action validity, and experiment efficiency across fixed cases.
+- **Observe:** collect and save a real signal with its source and time.
+- **Investigate:** keep the evidence and possible explanations in one case.
+- **Prove:** test one explanation in a safe copy of the system when one is connected.
+- **Rehearse:** check that the proposed recovery fixes the problem without creating another one.
+- **Approve:** leave any real-world change for a person to approve.
+- **Learn:** save the result as a postmortem and reusable runbook.
 
-## The user and the bottleneck
+## Why this matters
 
-Site reliability engineers and software engineers on call must diagnose production incidents while evidence is fragmented across metrics, logs, traces, deploy history, service topology, and runbooks. The component with the loudest error is often only a downstream victim. Under time pressure, both people and general-purpose assistants can collapse too quickly on the first plausible explanation.
+When an online service breaks, the evidence is spread across alerts, logs, service maps, recent changes, and old runbooks. The loudest alert may come from a service that is suffering, not the service that caused the problem. Under pressure, a person or an AI assistant can settle on the first believable answer too quickly.
 
 That failure matters because a confident but weakly grounded diagnosis can waste the recovery window or turn one incident into two. Google’s SRE guidance explicitly identifies automated analysis, root-cause assistance, and mitigation suggestions as valuable parts of incident response while retaining human review for critical operations. Recent trajectory-level RCA research also reports that endpoint correctness can hide unsupported or incomplete diagnostic reasoning.
 
-Faultline’s product promise is narrow:
+Faultline makes one careful promise:
 
-> Given an approved incident bundle, turn a plausible diagnosis into an executable before/after proof and a constrained recovery proposal an on-call engineer can verify before acting.
+> Save what happened, test the leading explanation safely, and show the before-and-after evidence before anyone changes production.
 
-## What makes the workflow agentic
+## What the agent does
 
-The advanced workflow does more than summarize supplied telemetry:
+The full workflow does more than summarize the data it receives:
 
-1. **Grounding:** inventory the observable fault surface and service topology.
-2. **Hypothesis competition:** keep multiple explanations alive rather than anchoring on the first anomaly.
-3. **Selective tool use:** query metrics, logs, traces, changes, and the action catalog separately.
-4. **Falsification:** ask which observation would most strongly contradict the leading diagnosis.
-5. **Counterfactual experiment:** apply one allowed intervention to a fresh isolated snapshot.
-6. **Causal verification:** require symptom clearance, a measurable health gain, and zero unrelated regressions.
-7. **Action validation:** reject targets and actions absent from the incident’s allowed catalog.
-8. **Human checkpoint:** never execute a consequential production recovery automatically.
-9. **Trajectory capture:** preserve every query, experiment, rejected explanation, and decision.
+1. Collect the available evidence and service relationships.
+2. Keep more than one possible cause open.
+3. Choose which evidence to inspect next.
+4. Look for evidence that could prove its leading idea wrong.
+5. Change one allowed variable in a fresh, isolated test.
+6. Check whether the original failure clears and the rest of the system stays healthy.
+7. Reject actions that are not on the approved list.
+8. Keep a person in control of any production change.
+9. Save every test, failed idea, and decision so another person can review it.
 
 Purposeful choices matter more than agent count. Faultline uses one investigator role and a skeptical verification stage; the verifier exists because unsupported inference is the failure mode being addressed.
 
 ## Live data versus proof data
 
-The dashboard opens in **Live Pulse**. A Supabase Edge Function fetches the official GitHub Status, Cloudflare Status, and npm Status APIs every two minutes. Each run, normalized snapshot, changed observation, and triage summary is timestamped and retained. Supabase Realtime pushes new snapshot and insight rows to connected dashboards, with a 30-second polling fallback.
+The dashboard opens in **Live Pulse**. Every two minutes, a scheduled collector reads the official GitHub Status, Cloudflare Status, and npm Status feeds. It saves each result with its source, time, and fingerprint. New records appear in the dashboard in real time, with a 30-second refresh as a fallback.
 
-Live Pulse is deliberately observational: it does not claim private telemetry, a hidden root cause, or authority to change third-party production systems. **Proof Lab** remains separate because its interventions can be executed safely, replayed from a clean environment, and scored against known labels. This separation makes the product dynamic without weakening the benchmark's reproducibility.
+Clicking **Investigate** turns a live signal into a durable case. The case keeps the source evidence and clearly says that causal proof is unavailable until a safe test environment is connected. Faultline does not claim access to private GitHub, Cloudflare, or npm data, and it never changes those systems.
+
+The **Counterfactual Lab** uses twelve fixed test incidents. These cases are separate because Faultline can safely replay them, make one controlled change, and compare the result with a known answer. The fixed lab is proof of the method, not a claim of perfect production accuracy.
+
+An optional protected endpoint can receive incidents from another monitoring tool. Imported cases stay private by default. The endpoint remains closed until an operator configures `FAULTLINE_INGEST_TOKEN`; see [External incident intake](docs/INGESTION.md).
 
 Model enrichment is optional. When `OPENAI_API_KEY` is configured as a Supabase Edge Function secret, the live observer uses the Responses API to produce an evidence-bounded triage summary. Without the key—or when the model is unavailable—collection continues and the deterministic summary is stored instead.
 
@@ -99,7 +101,7 @@ pnpm demo:full
 pnpm dev
 ```
 
-Open the printed local URL. Select **Run investigation**, inspect the causal chain and trajectory, approve the sandbox replay, and open **Baseline comparison**.
+Open the printed local URL. Start in **Live Pulse**, choose a real captured signal, and click **Investigate** to open its saved case. Then open the **Counterfactual Lab** to run a safe, reproducible proof case and inspect the before-and-after evidence.
 
 For a live representative run:
 
@@ -131,7 +133,7 @@ artifacts/trajectories/      Representative JSONL trajectories
 artifacts/incident-packages/ Recovery, postmortem and runbook artifacts
 docs/                        Architecture and evaluation detail
 supabase/migrations/         Live-memory schema and two-minute scheduler
-supabase/functions/          Public-status ingestion Edge Function
+supabase/functions/          Live collector, case promotion, and protected incident intake
 tests/                       Safety, trajectory, data and UI contracts
 ```
 
@@ -161,6 +163,7 @@ Main observed failure in the prior iteration: a recent change dominated the scor
 - [Agent trajectory guide](docs/AGENT_TRAJECTORIES.md)
 - [Five-minute demo pitch and visual direction](docs/DEMO_PITCH.md)
 - [Live data architecture and operations](docs/LIVE_DATA.md)
+- [External incident intake](docs/INGESTION.md)
 - [Pre-existing work disclosure](docs/PREEXISTING_WORK.md)
 
 ## Research grounding
